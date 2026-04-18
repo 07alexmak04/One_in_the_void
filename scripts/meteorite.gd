@@ -25,6 +25,7 @@ func _ready() -> void:
 	collision_layer = 1 << 2
 	collision_mask = (1 << 1) | (1 << 3)
 	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
 	spin_axis = Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)).normalized()
 	spin_speed = randf_range(0.6, 2.2)
 
@@ -62,6 +63,11 @@ func take_damage(dmg: int) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("take_hit"):
 		body.take_hit()
+	_explode()
+
+func _on_area_entered(area: Area3D) -> void:
+	if area.has_method("take_damage"):
+		area.take_damage(1) # Base damage for bullet contact
 	_explode()
 
 func _explode() -> void:
