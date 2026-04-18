@@ -111,8 +111,8 @@ func _spawn_meteorite() -> void:
 	var y := randf_range(-7.0, 7.0)
 	var start := Vector3(x, y, -40.0)
 	var target := Vector3(
-		player.global_position.x + randf_range(-4.0, 4.0),
-		player.global_position.y + randf_range(-3.0, 3.0),
+		player.global_position.x + randf_range(-8.0, 8.0),
+		player.global_position.y + randf_range(-6.0, 6.0),
 		0.0
 	)
 	var dir := (target - start).normalized()
