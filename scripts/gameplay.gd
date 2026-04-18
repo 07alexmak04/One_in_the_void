@@ -33,6 +33,10 @@ var _base_glow: float = 0.4
 var _health_pulse_tween: Tween = null
 
 func _ready() -> void:
+	# Allow _process to run even when the scene tree is paused,
+	# so the Escape key can toggle pause off again.
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	randomize()
 	cfg = GameState.get_config()
 	spawn_remaining = cfg["survival_time"]
@@ -186,10 +190,13 @@ func _do_explosion_ambient_pulse() -> void:
 	tw.tween_property(_env, "glow_intensity", _base_glow, 0.5)
 
 func _process(delta: float) -> void:
-	if finished:
-		return
-	if Input.is_action_just_pressed("pause"):
+	# Handle pause toggle first so Escape works even while paused.
+	# Don't allow pausing after the game has ended.
+	if Input.is_action_just_pressed("pause") and not finished:
 		_toggle_pause()
+		return
+
+	if finished or get_tree().paused:
 		return
 
 	if not spawning_done:
