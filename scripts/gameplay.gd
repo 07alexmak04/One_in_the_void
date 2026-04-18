@@ -16,14 +16,15 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
 
 var cfg: Dictionary
-var survival_remaining: float = 0.0
+var meteors_to_spawn: int = 0
 var finished: bool = false
 
 func _ready() -> void:
 	randomize()
 	cfg = GameState.get_config()
-	survival_remaining = cfg["survival_time"]
+	meteors_to_spawn = int(cfg["meteor_count"])
 	level_label.text = "Level: %s" % cfg["name"]
+	_update_rock_label()
 
 	player.configure(int(cfg["max_hits"]))
 	player.health_changed.connect(_on_player_health_changed)
@@ -41,21 +42,23 @@ func _ready() -> void:
 	resume_button.pressed.connect(_on_resume)
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if finished:
 		return
 	if Input.is_action_just_pressed("pause"):
 		_toggle_pause()
 		return
 
-	survival_remaining = max(survival_remaining - delta, 0.0)
-	survival_label.text = "Time: %0.1fs" % survival_remaining
-	if survival_remaining <= 0.0:
+	# Win once all rocks are spawned and none remain in the scene.
+	if meteors_to_spawn == 0 and get_tree().get_nodes_in_group("meteorite").is_empty():
 		_on_level_cleared()
 
 func _spawn_meteorite() -> void:
-	if finished:
+	if finished or meteors_to_spawn <= 0:
 		return
+	meteors_to_spawn -= 1
+	_update_rock_label()
+
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
 	var x := randf_range(-13.0, 13.0)
@@ -68,8 +71,17 @@ func _spawn_meteorite() -> void:
 	)
 	var dir := (target - start).normalized()
 	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2)
-	var hp := 2 + (GameState.current_difficulty)  # harder levels => tougher rocks
+	var hp := 2 + (GameState.current_difficulty)
 	m.configure(start, dir * speed, hp)
+
+	if meteors_to_spawn == 0:
+		spawn_timer.stop()
+
+func _update_rock_label() -> void:
+	if meteors_to_spawn > 0:
+		survival_label.text = "Rocks: %d" % meteors_to_spawn
+	else:
+		survival_label.text = "Hold on!"
 
 func _on_player_health_changed(current: int, max_hp: int) -> void:
 	if max_hp <= 0:
@@ -88,9 +100,6 @@ func _on_player_died() -> void:
 func _on_level_cleared() -> void:
 	finished = true
 	spawn_timer.stop()
-	# Clear remaining rocks so they don't hit the player during transition.
-	for m in get_tree().get_nodes_in_group("meteorite"):
-		m.queue_free()
 	if GameState.has_next_level():
 		get_tree().change_scene_to_file("res://scenes/victory.tscn")
 	else:
