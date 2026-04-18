@@ -1,48 +1,79 @@
-[gd_scene format=3 uid="uid://b1mmenu0void0"]
+[gd_scene load_steps=8 format=3 uid="uid://b1mmenu0void0"]
 
-[ext_resource type="Script" uid="uid://d154lip8pra7g" path="res://scripts/main_menu.gd" id="1_menu"]
-[ext_resource type="Texture2D" uid="uid://c84yhm2it3o7k" path="res://reference/Space Background.png" id="2_bg"]
-[ext_resource type="AudioStream" uid="uid://d13l41igkng2" path="res://reference/Space Music Pack/menu.wav" id="3_music"]
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="AudioStream" path="res://reference/Space Music Pack/menu.wav" id="3_music"]
 
-[node name="MainMenu" type="Control" unique_id=1065957344]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_menu"]
+sky_top_color = Color(0.02, 0.01, 0.06, 1)
+sky_horizon_color = Color(0.05, 0.02, 0.1, 1)
+ground_bottom_color = Color(0.01, 0.01, 0.03, 1)
+ground_horizon_color = Color(0.04, 0.02, 0.08, 1)
+
+[sub_resource type="Sky" id="Sky_menu"]
+sky_material = SubResource("ProceduralSkyMaterial_menu")
+
+[sub_resource type="Environment" id="Environment_menu"]
+background_mode = 2
+sky = SubResource("Sky_menu")
+ambient_light_source = 2
+ambient_light_color = Color(0.65, 0.7, 0.8, 1)
+ambient_light_energy = 0.4
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.1
+glow_blend_mode = 0
+tonemap_mode = 2
+
+[node name="MainMenuRoot" type="Node3D"]
+script = ExtResource("1_menu")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_menu")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 5, 5, 5)
+light_energy = 1.2
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6)
+fov = 60.0
+
+[node name="ShipPreviewPivot" type="Node3D" parent="."]
+transform = Transform3D(0.965926, 0.0669873, -0.25, 0, 0.965926, 0.258819, 0.258819, -0.25, 0.933013, 1.2, 0, 0)
+
+[node name="ShipPlaceholder" type="Node3D" parent="ShipPreviewPivot"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_menu")
 
-[node name="Background" type="TextureRect" parent="." unique_id=1163814219]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_bg")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="TitleLabel" type="Label" parent="." unique_id=1076910667]
+[node name="TitleLabel" type="Label" parent="CanvasLayer/UI"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 110.0
-offset_bottom = 190.0
+offset_top = 80.0
+offset_bottom = 160.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 72
 text = "ONE IN THE VOID"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="." unique_id=16017897]
+[node name="SubtitleLabel" type="Label" parent="CanvasLayer/UI"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 200.0
-offset_bottom = 240.0
+offset_top = 170.0
+offset_bottom = 210.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.6, 0.7, 0.9, 1)
 theme_override_font_sizes/font_size = 22
@@ -50,37 +81,37 @@ text = "Theme: Losing Control"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1993588198]
+[node name="MenuContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 100.0
+offset_top = -100.0
+offset_right = 400.0
+offset_bottom = 150.0
 grow_vertical = 2
+theme_override_constants/separation = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1211565622]
+[node name="StartButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_font_sizes/font_size = 24
+text = "Start Mission"
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=614331019]
-custom_minimum_size = Vector2(300, 64)
+[node name="CustomShipButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Start"
+theme_override_font_sizes/font_size = 24
+text = "Modify Spaceship"
 
-[node name="CustomShipButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1134470857]
-custom_minimum_size = Vector2(300, 64)
+[node name="QuitButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Custom Spaceship"
+theme_override_font_sizes/font_size = 24
+text = "Quit Game"
 
-[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=156686774]
-custom_minimum_size = Vector2(300, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Quit"
-
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1355279820]
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_music")
-volume_db = -8.0
 autoplay = true
+volume_db = -8.0

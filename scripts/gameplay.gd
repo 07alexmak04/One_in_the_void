@@ -2,8 +2,9 @@ extends Node3D
 
 const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 
-@onready var player: CharacterBody3D = $Player
-@onready var spawn_timer: Timer = $SpawnTimer
+@onready var player: CharacterBody3D = $World/Player
+@onready var spawn_timer: Timer = $World/SpawnTimer
+@onready var world: Node3D = $World
 @onready var survival_label: Label = $HUD/TopPanel/SurvivalLabel
 @onready var level_label: Label = $HUD/TopPanel/LevelLabel
 @onready var health_bar: ProgressBar = $HUD/TopPanel/HealthBar
@@ -17,7 +18,7 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var camera: Camera3D = $Camera3D
 @onready var world_env: WorldEnvironment = $WorldEnvironment
-@onready var background: MeshInstance3D = $Background
+@onready var background: MeshInstance3D = $World/Background
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
@@ -182,10 +183,11 @@ func _do_explosion_ambient_pulse() -> void:
 	tw.tween_property(_env, "ambient_light_energy", _base_ambient_energy, 0.5)
 	tw.tween_property(_env, "glow_intensity", _base_glow, 0.5)
 
-func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("pause") and not finished:
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause") and not finished:
 		_toggle_pause()
-		return
+
+func _process(_delta: float) -> void:
 	if finished or get_tree().paused:
 		return
 	if meteors_to_spawn == 0 and get_tree().get_nodes_in_group("meteorite").is_empty():
@@ -198,7 +200,7 @@ func _spawn_meteorite() -> void:
 		return
 	meteors_to_spawn -= 1
 	var m := MeteoriteScene.instantiate()
-	add_child(m)
+	world.add_child(m)
 	m.passed.connect(_on_rock_passed)
 	m.exploded.connect(_on_explosion)
 	var x := randf_range(-13.0, 13.0)

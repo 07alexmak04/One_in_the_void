@@ -73,12 +73,15 @@ light_energy = 0.8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
 fov = 70.0
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="World" type="Node3D" parent="."]
+process_mode = 1
 
-[node name="SpawnTimer" type="Timer" parent="."]
+[node name="Player" parent="World" instance=ExtResource("2_player")]
+
+[node name="SpawnTimer" type="Timer" parent="World"]
 wait_time = 0.9
 
-[node name="Background" type="MeshInstance3D" parent="."]
+[node name="Background" type="MeshInstance3D" parent="World"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -41)
 mesh = SubResource("BgMesh_void")
 surface_material_override/0 = SubResource("BgMaterial_void")
