@@ -4,7 +4,7 @@ signal health_changed(current: int, max: int)
 signal died
 
 @export var move_speed: float = 14.0
-@export var bounds: Vector3 = Vector3(14, 8, 0)  # half-extents around origin
+@export var bounds: Vector3 = Vector3(11, 6, 0)
 @export var rifle_cooldown: float = 0.15
 @export var rocket_cooldown: float = 0.9
 @export var invuln_time: float = 0.8
@@ -32,6 +32,7 @@ func _ready() -> void:
 	add_to_group("player")
 	collision_layer = 1 << 1
 	collision_mask = (1 << 2) | (1 << 4)
+
 func _physics_process(delta: float) -> void:
 	_rifle_timer = max(_rifle_timer - delta, 0.0)
 	_rocket_timer = max(_rocket_timer - delta, 0.0)

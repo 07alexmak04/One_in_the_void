@@ -22,11 +22,8 @@ func _ready() -> void:
 func _apply_missile_material(node: Node) -> void:
 	if node is MeshInstance3D:
 		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.65, 0.12, 0.05)
-		mat.emission_enabled = true
-		mat.emission = Color(1.0, 0.35, 0.05)
-		mat.emission_energy_multiplier = 3.0
-		mat.metallic = 0.5
+		mat.albedo_texture = load("res://reference/Rockets Missiles and Bombs - AurynSky/Textures/Red.png")
+		mat.metallic = 0.4
 		mat.roughness = 0.35
 		node.material_override = mat
 	for child in node.get_children():

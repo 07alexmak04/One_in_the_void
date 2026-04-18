@@ -2,6 +2,11 @@ extends Area3D
 
 signal passed
 
+const _STONE_MESH := preload("res://reference/Stones/STONE#1/STONE#1.obj")
+const _STONE_COLOR := preload("res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_color.png")
+const _STONE_NORMAL := preload("res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_normal.png")
+const _STONE_ROUGH := preload("res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_roughness.png")
+
 @export var speed: float = 12.0
 @export var hp: int = 3
 @export var explosion_radius: float = 5.0
@@ -104,11 +109,11 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	for i in range(10):
+	for i in range(14):
 		var debris := Area3D.new()
 		debris.collision_layer = 1 << 3
 		debris.collision_mask = (1 << 1) | (1 << 2)
-		debris.monitoring = false  # enabled next frame so dead rock isn't re-hit
+		debris.monitoring = false
 		scene_root.add_child(debris)
 		debris.global_position = pos
 		debris.set_deferred("monitoring", true)
@@ -120,30 +125,17 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 		debris.add_child(col)
 
 		var mi := MeshInstance3D.new()
-		var use_box: bool = rng.randi() % 2 == 0
-		var sz := rng.randf_range(0.25, 0.55)
-		if use_box:
-			var bm := BoxMesh.new()
-			bm.size = Vector3(sz, sz * rng.randf_range(0.4, 1.8), sz * rng.randf_range(0.5, 1.3))
-			mi.mesh = bm
-		else:
-			var sm := SphereMesh.new()
-			sm.radius = sz * 0.5
-			sm.height = sz
-			mi.mesh = sm
-
+		mi.mesh = _STONE_MESH
 		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(
-			rng.randf_range(0.28, 0.55),
-			rng.randf_range(0.18, 0.32),
-			rng.randf_range(0.08, 0.18),
-			1.0
-		)
-		mat.emission_enabled = true
-		mat.emission = Color(0.9, 0.4, 0.05)
-		mat.emission_energy_multiplier = rng.randf_range(1.5, 3.0)
+		mat.albedo_texture = _STONE_COLOR
+		mat.normal_enabled = true
+		mat.normal_texture = _STONE_NORMAL
+		mat.roughness_texture = _STONE_ROUGH
+		mat.roughness_texture_channel = 0
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mi.set_surface_override_material(0, mat)
+		var sz := rng.randf_range(0.18, 0.42)
+		mi.scale = Vector3(sz, sz * rng.randf_range(0.6, 1.4), sz * rng.randf_range(0.6, 1.4))
 		debris.add_child(mi)
 
 		debris.area_entered.connect(func(area: Area3D) -> void:
@@ -164,10 +156,10 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 		var dir := Vector3(
 			rng.randf_range(-1.0, 1.0),
 			rng.randf_range(-1.0, 1.0),
-			rng.randf_range(-0.5, 0.5)
+			rng.randf_range(-0.6, 0.6)
 		).normalized()
-		var dist := rng.randf_range(2.5, 6.0)
-		var duration := rng.randf_range(0.5, 0.9)
+		var dist := rng.randf_range(5.0, 12.0)
+		var duration := rng.randf_range(0.7, 1.2)
 		var end_pos := pos + dir * dist
 
 		var rot_end := Vector3(
@@ -178,8 +170,7 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 
 		var dtween := debris.create_tween()
 		dtween.set_parallel(true)
-		dtween.tween_property(debris, "global_position", end_pos, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		dtween.tween_property(debris, "scale", Vector3(0.05, 0.05, 0.05), duration).set_trans(Tween.TRANS_QUAD)
+		dtween.tween_property(debris, "global_position", end_pos, duration).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		dtween.tween_property(mi, "scale", Vector3.ZERO, duration).set_trans(Tween.TRANS_QUAD)
 		dtween.tween_property(debris, "rotation", rot_end, duration)
-		dtween.tween_method(func(a: float) -> void: mat.albedo_color.a = a, 1.0, 0.0, duration)
 		dtween.chain().tween_callback(debris.queue_free)
