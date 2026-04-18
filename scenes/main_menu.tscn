@@ -107,9 +107,21 @@ transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 
 [node name="PlanetPlaceholder" type="Node3D" parent="PlanetPivot"]
 
 [node name="ShipPreviewPivot" type="Node3D" parent="."]
-transform = Transform3D(0.965926, 0.0669873, -0.25, 0, 0.965926, 0.258819, 0.258819, -0.25, 0.933013, 1.2, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.4, 0.5)
 
 [node name="ShipPlaceholder" type="Node3D" parent="ShipPreviewPivot"]
+
+[node name="ShipLight" type="OmniLight3D" parent="ShipPreviewPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 2)
+light_color = Color(0.7, 0.9, 1, 1)
+light_energy = 4.0
+omni_range = 10.0
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="SpaceBG" parent="BackgroundLayer" instance=ExtResource("2_spbg")]
+show_debris = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -120,10 +132,34 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_menu")
 
-[node name="SpaceBG" parent="." instance=ExtResource("2_spbg")]
-show_debris = true
+[node name="TitleLabel" type="Label" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 80.0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 72
+text = "ONE IN THE VOID"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 170.0
+offset_bottom = 210.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "Theme: Racing through the Void"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="MenuContainer" type="VBoxContainer" parent="CanvasLayer/UI"]
 layout_mode = 1
@@ -140,19 +176,13 @@ theme_override_constants/separation = 26
 [node name="StartButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 24
-
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 72
-text = "ONE IN THE VOID"
-horizontal_alignment = 1
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+text = "Start Mission"
 
 [node name="CustomShipButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
 custom_minimum_size = Vector2(0, 60)
@@ -168,16 +198,16 @@ text = "Modify Spaceship"
 [node name="QuitButton" type="Button" parent="CanvasLayer/UI/MenuContainer"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Hangar"
-
-[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(300, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Quit"
+theme_override_colors/font_hover_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+text = "Quit Game"
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_music")
 autoplay = true
 volume_db = -8.0
+ Maryland

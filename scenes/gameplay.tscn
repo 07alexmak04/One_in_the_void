@@ -96,10 +96,8 @@ process_mode = 1
 [node name="SpawnTimer" type="Timer" parent="World"]
 wait_time = 0.9
 
-[node name="Background" type="MeshInstance3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -41)
-mesh = SubResource("BgMesh_void")
-surface_material_override/0 = SubResource("BgMaterial_void")
+[node name="SpaceBG" parent="." instance=ExtResource("5_spbg")]
+show_debris = true
 
 [node name="HUD" type="CanvasLayer" parent="."]
 

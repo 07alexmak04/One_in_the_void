@@ -36,7 +36,7 @@ func _on_button_hover(btn: Button, hovered: bool) -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	# Subtle drifting rotation for the ship
-	ship_pivot.rotation.y += delta * 0.15
+	ship_pivot.rotation.y += delta * 0.4
 	ship_pivot.rotation.x = sin(_time * 0.5) * 0.1
 	ship_pivot.position.y = sin(_time * 0.8) * 0.15
 	
@@ -50,7 +50,7 @@ func _load_ship_preview() -> void:
 	var model_scene = load(skin_data["model"])
 	if model_scene:
 		var instance: Node3D = model_scene.instantiate()
-		var s: float = skin_data["scale"] * 0.8
+		var s: float = skin_data["scale"] * 3.0
 		instance.transform = Transform3D(
 			Vector3(0, 0, s), Vector3(0, s, 0), Vector3(-s, 0, 0),
 			Vector3.ZERO

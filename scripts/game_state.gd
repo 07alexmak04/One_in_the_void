@@ -11,31 +11,10 @@ var selected_skin: String = "light_cruiser_01"
 # Persisted unlocks
 var unlocked_skins: Array = ["light_cruiser_01"]
 
+# Post-game results from latest session
+var last_time_used: float = 0.0
+var last_stars: int = 0
 
-# Per-difficulty tuning.
-const LEVEL_CONFIG := {
-	Difficulty.BEGINNER: {
-		"name": "Beginner",
-		"max_hits": 5,
-		"survival_time": 15.0,
-		"meteor_spawn_interval": 0.9,
-		"meteor_speed": 12.0,
-	},
-	Difficulty.INTERMEDIATE: {
-		"name": "Intermediate",
-		"max_hits": 3,
-		"survival_time": 30.0,
-		"meteor_spawn_interval": 0.55,
-		"meteor_speed": 16.0,
-	},
-	Difficulty.HARD: {
-		"name": "Hard",
-		"max_hits": 1,
-		"survival_time": 60.0,
-		"meteor_spawn_interval": 0.35,
-		"meteor_speed": 22.0,
-	},
-}
 
 # --- Ship skins ---
 # Each skin: id, display name, model path, texture path, unlock condition.
@@ -122,26 +101,40 @@ const DIFFICULTY_CONFIGS := {
 	Difficulty.BEGINNER: {
 		"name": "Beginner",
 		"meteor_count": 15,
-		"meteor_spawn_interval": 1.2,
-		"max_hits": 8,
-		"hit_damage": 1,
-		"meteor_speed": 10.0,
+		"meteor_spawn_interval": 1.1,
+		"max_hits": 5,
+		"meteor_speed": 11.0,
+		"waypoint_radius": 3.5,
+		"course_distance": 50.0,
+		"course_points": [
+			Vector2(0, 0), Vector2(10, 20), Vector2(-10, 40), Vector2(10, 60), Vector2(0, 80)
+		]
 	},
 	Difficulty.INTERMEDIATE: {
 		"name": "Intermediate",
 		"meteor_count": 35,
-		"meteor_spawn_interval": 0.75,
-		"max_hits": 5,
-		"hit_damage": 1,
-		"meteor_speed": 16.0,
+		"meteor_spawn_interval": 0.65,
+		"max_hits": 3,
+		"meteor_speed": 17.0,
+		"waypoint_radius": 3.0,
+		"course_distance": 80.0,
+		"course_points": [
+			Vector2(0, 0), Vector2(20, 30), Vector2(-20, 60), Vector2(20, 90), 
+			Vector2(-20, 120), Vector2(20, 150), Vector2(0, 180)
+		]
 	},
 	Difficulty.HARD: {
 		"name": "Hard",
-		"meteor_count": 80,
-		"meteor_spawn_interval": 0.45,
-		"max_hits": 4,
-		"hit_damage": 1,
-		"meteor_speed": 22.0,
+		"meteor_count": 90,
+		"meteor_spawn_interval": 0.4,
+		"max_hits": 1,
+		"meteor_speed": 24.0,
+		"waypoint_radius": 2.5,
+		"course_distance": 120.0,
+		"course_points": [
+			Vector2(0, 0), Vector2(30, 40), Vector2(-30, 80), Vector2(30, 120),
+			Vector2(-30, 160), Vector2(30, 200), Vector2(-30, 240), Vector2(30, 280), Vector2(0, 320)
+		]
 	},
 }
 

@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://cniaxmpxjuj4v"]
+[gd_scene load_steps=6 format=3 uid="uid://cniaxmpxjuj4v"]
 
 [ext_resource type="Script" path="res://scripts/custom_ship.gd" id="1_cs"]
-[ext_resource type="Texture2D" path="res://reference/minimalist_showroom.png" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/slow-travel.wav" id="3_music"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
@@ -47,7 +47,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.1)
+color = Color(0, 0, 0, 0.15)
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true
@@ -58,39 +58,7 @@ render_target_update_mode = 4
 [node name="PreviewScene" type="Node3D" parent="SubViewport"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewport/PreviewScene"]
-transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.6, 9.0)
-fov = 40.0
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/PreviewScene"]
-environment = SubResource("Environment_preview")
-
-[node name="CenterLight" type="OmniLight3D" parent="SubViewport/PreviewScene"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-light_color = Color(0.5, 0.8, 1, 1)
-light_energy = 2.0
-omni_range = 8.0
-
-[node name="ModelRoot" type="Node3D" parent="SubViewport/PreviewScene"]
-
-[node name="ShipShowcase" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.1)
-
-[node name="SubViewport" type="SubViewport" parent="."]
-transparent_bg = true
-handle_input_locally = false
-size = Vector2i(1280, 720)
-render_target_update_mode = 4
-
-[node name="PreviewScene" type="Node3D" parent="SubViewport"]
-
-[node name="Camera3D" type="Camera3D" parent="SubViewport/PreviewScene"]
-transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.6, 9.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.5)
 fov = 40.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/PreviewScene"]
@@ -232,5 +200,4 @@ text = "Back"
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_music")
 autoplay = true
-volume_db = -8.0
  Maryland

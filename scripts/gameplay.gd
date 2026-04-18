@@ -253,22 +253,36 @@ func _update_skill_ui(_delta: float) -> void:
 		skill_ready_label.visible = true
 
 func _spawn_meteorite() -> void:
-	if finished or meteors_to_spawn <= 0:
+	if finished:
 		return
-	meteors_to_spawn -= 1
+	
 	var m := MeteoriteScene.instantiate()
 	world.add_child(m)
 	m.exploded.connect(_on_explosion)
-	var x := randf_range(-13.0, 13.0)
-	var y := randf_range(-7.0, 7.0)
-	var start := Vector3(x, y, -40.0)
-	var target := Vector3(player.global_position.x + randf_range(-4.0, 4.0), player.global_position.y + randf_range(-3.0, 3.0), 0.0)
-	var dir := (target - start).normalized()
+	
+	var pp := player.global_position
+	var pv := player.velocity
 	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2) * rock_speed_multiplier
+	
+	var start := Vector3.ZERO
+	var target := Vector3.ZERO
+	var roll := randf()
+	
+	if roll < 0.7:
+		# Front approach with prediction
+		start = pp + Vector3(randf_range(-15.0, 15.0), randf_range(-9.0, 9.0), -38.0)
+		var travel_time: float = 38.0 / maxf(speed, 1.0)
+		var predicted := pp + pv * travel_time * randf_range(0.4, 0.8)
+		target = Vector3(predicted.x + randf_range(-2.5, 2.5), predicted.y + randf_range(-2.0, 2.0), pp.z + 5.0)
+	else:
+		# Side/Ambush approach
+		var side_x := 18.0 if randf() > 0.5 else -18.0
+		start = pp + Vector3(side_x, randf_range(-8.0, 8.0), randf_range(-10.0, 10.0))
+		target = pp + Vector3(randf_range(-3.0, 3.0), randf_range(-3.0, 3.0), pp.z)
+	
+	var dir := (target - start).normalized()
 	var hp := 2 + (GameState.current_difficulty)
 	m.configure(start, dir * speed, hp)
-	if meteors_to_spawn == 0:
-		spawn_timer.stop()
 
 func trigger_slow_motion(multiplier: float, duration: float) -> void:
 	rock_speed_multiplier = multiplier
@@ -316,6 +330,14 @@ func _on_player_died() -> void:
 func _on_level_victory() -> void:
 	finished = true
 	spawn_timer.stop()
+	
+	# Record results
+	GameState.last_time_used = time_used
+	var stars := 3
+	if time_used > 180.0: stars = 1
+	elif time_used > 90.0: stars = 2
+	GameState.last_stars = stars
+	
 	for m in get_tree().get_nodes_in_group("meteorite"):
 		m.queue_free()
 	get_tree().change_scene_to_file("res://scenes/victory.tscn")
@@ -337,4 +359,3 @@ func _on_quit_to_menu() -> void:
 	get_tree().paused = false
 	GameState.reset_progression()
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
- Maryland

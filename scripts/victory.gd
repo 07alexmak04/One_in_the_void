@@ -17,7 +17,7 @@ func _ready() -> void:
 	message_label.text = "Congratulations!\nYou cleared %s." % cleared_name
 
 	# Show time and stars.
-	var t := GameState.last_time_used
+	var t: float = GameState.last_time_used
 	var mins := int(t) / 60
 	var secs := int(t) % 60
 	time_label.text = "Time: %d:%02d" % [mins, secs]

@@ -119,6 +119,8 @@ func _find_male_voice() -> void:
 	tts_voice_id = en_voices[0]
 
 func _process(delta: float) -> void:
+	if current_index >= DIALOGUES.size():
+		return
 	_time += delta
 
 	# --- WARNING LABEL: pulsing red, faster each dialogue ---
