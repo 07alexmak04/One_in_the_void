@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1mmvict0void"]
+
+[ext_resource type="Script" path="res://scripts/victory.gd" id="1_vic"]
+
+[node name="Victory" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vic")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.1, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="MessageLabel" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 1, 0.9, 1)
+theme_override_font_sizes/font_size = 44
+text = "Congratulations!"
+horizontal_alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="NextButton" type="Button" parent="CenterContainer/VBox/HBox"]
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Next Level"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/VBox/HBox"]
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Quit"
