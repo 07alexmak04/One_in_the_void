@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cnigsyywjuj4v"]
+[gd_scene format=3 uid="uid://cnigsyywjuj4v"]
 
 [ext_resource type="Script" path="res://scripts/intro_dialogue.gd" id="1_intro"]
 [ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
