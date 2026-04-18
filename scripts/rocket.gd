@@ -2,7 +2,7 @@ extends Area3D
 
 @export var speed: float = 32.0
 @export var accel: float = 40.0
-@export var life_time: float = 3.5
+@export var life_time: float = 1.2
 @export var damage: int = 5
 @export var splash_radius: float = 4.0
 
@@ -30,6 +30,13 @@ func _on_area_entered(_area: Area3D) -> void:
 	_explode()
 
 func _explode() -> void:
+	# Safety check: Don't explode if too close to player to avoid self-damage.
+	var players := get_tree().get_nodes_in_group("player")
+	if players.size() > 0 and is_instance_valid(players[0]):
+		if global_position.distance_to(players[0].global_position) < 5.0:
+			queue_free()
+			return
+
 	# Splash damage: affect all meteorites inside splash_radius.
 	var tree := get_tree()
 	if tree:
