@@ -59,6 +59,80 @@ func take_damage(dmg: int) -> void:
 	if hp <= 0:
 		_explode()
 
+func split_from_buddy() -> void:
+	# Buddy bullet hit this rock — break into 2-3 smaller fragments aimed at the player.
+	if _exploding:
+		return
+	_exploding = true
+	var pos := global_position
+	var scene_root := get_tree().current_scene
+	var players := get_tree().get_nodes_in_group("player")
+	var player_pos := Vector3.ZERO
+	if players.size() > 0 and is_instance_valid(players[0]):
+		player_pos = players[0].global_position
+
+	var frag_count := randi_range(2, 3)
+	for i in frag_count:
+		var frag := Area3D.new()
+		frag.add_to_group("meteorite")
+		frag.collision_layer = 1 << 2
+		frag.collision_mask = (1 << 1) | (1 << 3)
+		scene_root.add_child(frag)
+		frag.global_position = pos + Vector3(randf_range(-0.5, 0.5), randf_range(-0.5, 0.5), 0)
+
+		var col := CollisionShape3D.new()
+		var shape := SphereShape3D.new()
+		shape.radius = 0.5
+		col.shape = shape
+		frag.add_child(col)
+
+		var mi := MeshInstance3D.new()
+		mi.mesh = _STONE_MESH
+		var mat := StandardMaterial3D.new()
+		mat.albedo_texture = _STONE_COLOR
+		mat.normal_enabled = true
+		mat.normal_texture = _STONE_NORMAL
+		mat.roughness_texture = _STONE_ROUGH
+		mat.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
+		var frag_scale := randf_range(0.25, 0.45)
+		mi.scale = Vector3(frag_scale, frag_scale, frag_scale)
+		mi.set_surface_override_material(0, mat)
+		frag.add_child(mi)
+
+		# Fly toward the player with some spread.
+		var to_player := (player_pos - pos).normalized()
+		var spread := Vector3(randf_range(-0.4, 0.4), randf_range(-0.4, 0.4), randf_range(-0.2, 0.2))
+		var frag_dir := (to_player + spread).normalized()
+		var frag_speed := randf_range(8.0, 14.0)
+		var frag_vel := frag_dir * frag_speed
+		var spin_ax := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		var spin_sp := randf_range(2.0, 5.0)
+
+		# Fragment hits player on contact.
+		frag.body_entered.connect(func(body: Node) -> void:
+			if not is_instance_valid(frag):
+				return
+			if body.has_method("take_hit"):
+				body.take_hit()
+			frag.queue_free()
+		)
+
+		# Auto-despawn after time.
+		var life_timer := frag.create_tween()
+		life_timer.tween_interval(4.0)
+		life_timer.tween_callback(frag.queue_free)
+
+		# Movement via tween callback each frame (simple approach).
+		var move_tw := frag.create_tween()
+		move_tw.set_loops(240)  # ~4 seconds at 60fps
+		move_tw.tween_callback(func() -> void:
+			if is_instance_valid(frag) and is_instance_valid(mi):
+				frag.global_position += frag_vel * (1.0 / 60.0)
+				mi.rotate(spin_ax, spin_sp * (1.0 / 60.0))
+		).set_delay(1.0 / 60.0)
+
+	queue_free()
+
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("take_hit"):
 		body.take_hit()

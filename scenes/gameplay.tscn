@@ -85,8 +85,8 @@ transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 
 light_energy = 0.8
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
-fov = 70.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 18)
+fov = 75.0
 
 [node name="World" type="Node3D" parent="."]
 process_mode = 1
@@ -157,9 +157,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -316.0
+offset_left = -340.0
 offset_top = 14.0
-offset_right = -16.0
+offset_right = -60.0
 offset_bottom = 42.0
 grow_horizontal = 0
 max_value = 5.0
@@ -168,6 +168,20 @@ show_percentage = false
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
 theme_override_styles/over = SubResource("StyleBoxFlat_hp_border")
+
+[node name="MenuButton" type="Button" parent="HUD/TopPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -52.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 48.0
+grow_horizontal = 0
+process_mode = 3
+theme_override_font_sizes/font_size = 22
+text = "☰"
 
 [node name="SkillPanel" type="Control" parent="HUD"]
 layout_mode = 3
