@@ -35,9 +35,14 @@ func configure(start_pos: Vector3, vel: Vector3, meteor_hp: int = 3) -> void:
 	hp = meteor_hp
 
 func _physics_process(delta: float) -> void:
-	global_position += velocity * delta
+	var multiplier: float = 1.0
+	var parent = get_parent() # This is the 'World' node
+	if parent and parent.get_parent() and "rock_speed_multiplier" in parent.get_parent():
+		multiplier = parent.get_parent().rock_speed_multiplier
+		
+	global_position += velocity * delta * multiplier
 	if is_instance_valid(mesh):
-		mesh.rotate(spin_axis, spin_speed * delta)
+		mesh.rotate(spin_axis, spin_speed * delta * multiplier)
 	if global_position.z > 18.0:
 		emit_signal("passed")
 		queue_free()

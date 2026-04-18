@@ -19,11 +19,15 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var camera: Camera3D = $Camera3D
 @onready var world_env: WorldEnvironment = $WorldEnvironment
 @onready var background: MeshInstance3D = $World/Background
+@onready var skill_name_label: Label = $HUD/SkillPanel/VBox/SkillName
+@onready var skill_cd_bar: ProgressBar = $HUD/SkillPanel/VBox/CooldownBar
+@onready var skill_ready_label: Label = $HUD/SkillPanel/VBox/ReadyLabel
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
 var rocks_avoided: int = 0
 var finished: bool = false
+var rock_speed_multiplier: float = 1.0
 
 var _hit_flash: ColorRect = null
 var _vignette: ColorRect = null
@@ -187,11 +191,28 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause") and not finished:
 		_toggle_pause()
 
-func _process(_delta: float) -> void:
+func _update_skill_ui(delta: float) -> void:
+	if not is_instance_valid(player) or player.skill_info.is_empty():
+		return
+		
+	var cd: float = player.skill_cooldown_timer
+	var total_cd: float = player.skill_info["cooldown"]
+	
+	skill_name_label.text = "Skill: " + player.skill_info["name"] + " (Q)"
+	
+	if cd > 0:
+		skill_cd_bar.value = (1.0 - (cd / total_cd)) * 100.0
+		skill_ready_label.visible = false
+	else:
+		skill_cd_bar.value = 100.0
+		skill_ready_label.visible = true
+
+func _process(delta: float) -> void:
+	_update_skill_ui(delta)
 	if finished or get_tree().paused:
 		return
 	if meteors_to_spawn == 0 and get_tree().get_nodes_in_group("meteorite").is_empty():
-		_on_level_cleared()
+		_on_level_victory()
 	background.position.x = -player.global_position.x * 0.08
 	background.position.y = -player.global_position.y * 0.06
 
@@ -212,11 +233,17 @@ func _spawn_meteorite() -> void:
 		0.0
 	)
 	var dir := (target - start).normalized()
-	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2)
+	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2) * rock_speed_multiplier
 	var hp := 2 + GameState.current_difficulty
 	m.configure(start, dir * speed, hp)
 	if meteors_to_spawn == 0:
 		spawn_timer.stop()
+
+func trigger_slow_motion(multiplier: float, duration: float) -> void:
+	rock_speed_multiplier = multiplier
+	var tw := create_tween()
+	tw.tween_interval(duration)
+	tw.tween_property(self, "rock_speed_multiplier", 1.0, 0.5)
 
 func _on_rock_passed() -> void:
 	rocks_avoided += 1
@@ -262,15 +289,10 @@ func _on_player_died() -> void:
 	retry_button.visible = true
 	game_over_panel.visible = true
 
-func _on_level_cleared() -> void:
+func _on_level_victory() -> void:
 	finished = true
 	spawn_timer.stop()
-	var newly: String = GameState.unlock_skin_for_difficulty(GameState.current_difficulty)
-	GameState.save_prefs()
-	if GameState.has_next_level():
-		get_tree().change_scene_to_file("res://scenes/victory.tscn")
-	else:
-		get_tree().change_scene_to_file("res://scenes/final_victory.tscn")
+	get_tree().change_scene_to_file("res://scenes/victory.tscn")
 
 func _toggle_pause() -> void:
 	var paused := not get_tree().paused

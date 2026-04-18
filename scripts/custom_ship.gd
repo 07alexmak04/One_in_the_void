@@ -8,6 +8,9 @@ extends Control
 @onready var grid: GridContainer = $Content/ScrollContainer/Grid
 @onready var preview_viewport: SubViewport = $Content/PreviewPanel/SubViewportContainer/SubViewport
 @onready var preview_model_root: Node3D = $Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene/ModelRoot
+@onready var skill_title_label: Label = $Content/InfoPanel/VBox/SkillTitle
+@onready var skill_desc_label: Label = $Content/InfoPanel/VBox/SkillDesc
+@onready var skill_separator: Control = $Content/InfoPanel/VBox/SkillSeparator
 
 var current_skin_index: int = 0
 var _preview_instance: Node3D = null
@@ -57,6 +60,16 @@ func _show_skin(index: int) -> void:
 		ship_name_label.text = skin["name"]
 		ship_desc_label.text = skin["description"]
 		unlock_label.text = ""
+		
+		# Show skill info
+		skill_separator.visible = true
+		skill_title_label.visible = true
+		skill_desc_label.visible = true
+		
+		var sk = skin["skill"]
+		skill_title_label.text = "Ability: " + sk["name"]
+		skill_desc_label.text = sk.get("skill_desc", "No description available.")
+		
 		if skin["id"] == GameState.selected_skin:
 			select_button.text = "Equipped"
 			select_button.disabled = true
@@ -76,6 +89,11 @@ func _show_skin(index: int) -> void:
 		select_button.text = "Locked"
 		select_button.disabled = true
 		_clear_preview()
+		
+		# Hide skill info
+		skill_separator.visible = false
+		skill_title_label.visible = false
+		skill_desc_label.visible = false
 
 func _load_preview(skin: Dictionary) -> void:
 	_clear_preview()
