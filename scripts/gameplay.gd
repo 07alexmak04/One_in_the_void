@@ -14,21 +14,45 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var pause_panel: Control = $HUD/PausePanel
 @onready var resume_button: Button = $HUD/PausePanel/VBox/ResumeButton
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
+@onready var camera: Camera3D = $Camera3D
+@onready var world_env: WorldEnvironment = $WorldEnvironment
+@onready var background: MeshInstance3D = $Background
 
 var cfg: Dictionary
 var spawn_remaining: float = 0.0
 var spawning_done: bool = false
 var finished: bool = false
 
+var _hit_flash: ColorRect = null
+var _vignette: ColorRect = null
+var _camera_origin: Vector3 = Vector3.ZERO
+var _health_fill_style: StyleBoxFlat = null
+var _env: Environment = null
+var _base_ambient_energy: float = 0.55
+var _base_glow: float = 0.4
+var _health_pulse_tween: Tween = null
+
 func _ready() -> void:
 	randomize()
 	cfg = GameState.get_config()
 	spawn_remaining = cfg["survival_time"]
 	level_label.text = "Level: %s" % cfg["name"]
+	_camera_origin = camera.position
 
-	player.configure(int(cfg["max_hits"]))
+	_env = world_env.environment
+	_base_ambient_energy = _env.ambient_light_energy
+	_base_glow = 0.4 + GameState.current_difficulty * 0.12
+	_env.glow_intensity = _base_glow
+
+	_build_vignette()
+	_build_hit_flash()
+	_build_health_style()
+	_build_starfield()
+
+	player.configure(int(cfg["max_hits"]), 1)
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
+	player.got_hit.connect(_on_player_got_hit)
 	_on_player_health_changed(int(cfg["max_hits"]), int(cfg["max_hits"]))
 
 	spawn_timer.wait_time = float(cfg["meteor_spawn_interval"])
@@ -41,6 +65,125 @@ func _ready() -> void:
 	go_quit_button.pressed.connect(_on_quit_to_menu)
 	resume_button.pressed.connect(_on_resume)
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
+
+func _build_health_style() -> void:
+	_health_fill_style = StyleBoxFlat.new()
+	_health_fill_style.bg_color = Color(0.2, 0.9, 0.2)
+	health_bar.add_theme_stylebox_override("fill", _health_fill_style)
+
+func _build_vignette() -> void:
+	_vignette = ColorRect.new()
+	_vignette.color = Color(0.5, 0.0, 0.0, 0.0)
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hud: CanvasLayer = $HUD
+	hud.add_child(_vignette)
+	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+func _build_hit_flash() -> void:
+	_hit_flash = ColorRect.new()
+	_hit_flash.color = Color(1.0, 0.0, 0.0, 0.0)
+	_hit_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hud: CanvasLayer = $HUD
+	hud.add_child(_hit_flash)
+	_hit_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+func _build_starfield() -> void:
+	var speed_mult := 1.0 + GameState.current_difficulty * 0.4
+
+	var particles := GPUParticles3D.new()
+	particles.amount = 320
+	particles.lifetime = 2.2
+	particles.preprocess = 2.2
+	particles.randomness = 0.5
+
+	var mat := ParticleProcessMaterial.new()
+	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	mat.emission_box_extents = Vector3(18.0, 11.0, 24.0)
+	mat.direction = Vector3(0.0, 0.0, 1.0)
+	mat.spread = 1.5
+	mat.initial_velocity_min = 22.0 * speed_mult
+	mat.initial_velocity_max = 44.0 * speed_mult
+	mat.gravity = Vector3.ZERO
+	mat.scale_min = 0.4
+	mat.scale_max = 1.3
+
+	var grad := Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.08, 0.82, 1.0])
+	grad.colors = PackedColorArray([
+		Color(0.8, 0.9, 1.0, 0.0),
+		Color(0.9, 0.95, 1.0, 1.0),
+		Color(0.9, 0.95, 1.0, 1.0),
+		Color(1.0, 1.0, 1.0, 0.0),
+	])
+	var grad_tex := GradientTexture1D.new()
+	grad_tex.gradient = grad
+	mat.color_ramp = grad_tex
+
+	particles.process_material = mat
+
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.07
+	mesh.height = 0.14
+	mesh.radial_segments = 4
+	mesh.rings = 2
+
+	var star_mat := StandardMaterial3D.new()
+	star_mat.emission_enabled = true
+	star_mat.emission = Color(0.85, 0.92, 1.0)
+	star_mat.emission_energy_multiplier = 5.0
+	star_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	star_mat.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+	mesh.surface_set_material(0, star_mat)
+
+	particles.draw_pass_1 = mesh
+	particles.position = Vector3(0.0, 0.0, -20.0)
+	add_child(particles)
+
+func _on_player_got_hit() -> void:
+	_do_hit_flash()
+	_do_camera_shake()
+
+func _do_hit_flash() -> void:
+	_hit_flash.color.a = 0.55
+	var tw := create_tween()
+	tw.tween_property(_hit_flash, "color:a", 0.0, 0.35)
+
+func _do_camera_shake() -> void:
+	var tw := create_tween()
+	tw.set_loops(6)
+	tw.tween_method(func(t: float) -> void:
+		camera.position = _camera_origin + Vector3(
+			sin(t * 40.0) * 0.18,
+			cos(t * 37.0) * 0.14,
+			0.0
+		)
+	, 0.0, 1.0, 0.05)
+	tw.tween_callback(func() -> void: camera.position = _camera_origin)
+
+func _on_explosion(_pos: Vector3) -> void:
+	_do_explosion_camera_shake()
+	_do_explosion_ambient_pulse()
+
+func _do_explosion_camera_shake() -> void:
+	var tw := create_tween()
+	tw.set_loops(3)
+	tw.tween_method(func(t: float) -> void:
+		camera.position = _camera_origin + Vector3(
+			sin(t * 30.0) * 0.10,
+			cos(t * 28.0) * 0.08,
+			0.0
+		)
+	, 0.0, 1.0, 0.04)
+	tw.tween_callback(func() -> void: camera.position = _camera_origin)
+
+func _do_explosion_ambient_pulse() -> void:
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(_env, "ambient_light_energy", _base_ambient_energy * 3.5, 0.07)
+	tw.tween_property(_env, "glow_intensity", _base_glow * 2.2, 0.07)
+	tw.chain().set_parallel(true)
+	tw.tween_property(_env, "ambient_light_energy", _base_ambient_energy, 0.5)
+	tw.tween_property(_env, "glow_intensity", _base_glow, 0.5)
 
 func _process(delta: float) -> void:
 	if finished:
@@ -61,11 +204,16 @@ func _process(delta: float) -> void:
 		if rocks_left == 0:
 			_on_level_cleared()
 
+	# Parallax: background drifts opposite to player
+	background.position.x = -player.global_position.x * 0.08
+	background.position.y = -player.global_position.y * 0.06
+
 func _spawn_meteorite() -> void:
 	if finished or spawning_done:
 		return
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
+	m.exploded.connect(_on_explosion)
 	var x := randf_range(-13.0, 13.0)
 	var y := randf_range(-7.0, 7.0)
 	var start := Vector3(x, y, -40.0)
@@ -76,7 +224,7 @@ func _spawn_meteorite() -> void:
 	)
 	var dir := (target - start).normalized()
 	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2)
-	var hp := 2 + (GameState.current_difficulty)  # harder levels => tougher rocks
+	var hp := 2 + (GameState.current_difficulty)
 	m.configure(start, dir * speed, hp)
 
 func _on_player_health_changed(current: int, max_hp: int) -> void:
@@ -85,6 +233,31 @@ func _on_player_health_changed(current: int, max_hp: int) -> void:
 		return
 	health_bar.max_value = max_hp
 	health_bar.value = current
+	var pct := float(current) / float(max_hp)
+	if _health_fill_style:
+		var c: Color
+		if pct > 0.5:
+			c = Color(0.2, 0.9, 0.2).lerp(Color(1.0, 0.85, 0.0), (1.0 - pct) * 2.0)
+		else:
+			c = Color(1.0, 0.85, 0.0).lerp(Color(0.9, 0.1, 0.1), (0.5 - pct) * 2.0)
+		_health_fill_style.bg_color = c
+	var danger := 1.0 - pct
+	if _vignette:
+		_vignette.color.a = danger * 0.32
+	if _env:
+		var base_color := Color(0.72, 0.68, 0.62)
+		var red_color := Color(0.85, 0.18, 0.12)
+		_env.ambient_light_color = base_color.lerp(red_color, danger * 0.65)
+	if pct <= 0.25:
+		if _health_pulse_tween == null or not _health_pulse_tween.is_running():
+			_health_pulse_tween = create_tween().set_loops()
+			_health_pulse_tween.tween_property(health_bar, "modulate:a", 0.3, 0.35)
+			_health_pulse_tween.tween_property(health_bar, "modulate:a", 1.0, 0.35)
+	else:
+		if _health_pulse_tween:
+			_health_pulse_tween.kill()
+			_health_pulse_tween = null
+			health_bar.modulate.a = 1.0
 
 func _on_player_died() -> void:
 	finished = true
