@@ -18,6 +18,7 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
+var rocks_avoided: int = 0
 var finished: bool = false
 
 func _ready() -> void:
@@ -59,10 +60,10 @@ func _spawn_meteorite() -> void:
 	if finished or meteors_to_spawn <= 0:
 		return
 	meteors_to_spawn -= 1
-	_update_rock_label()
 
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
+	m.passed.connect(_on_rock_passed)
 	var x := randf_range(-13.0, 13.0)
 	var y := randf_range(-7.0, 7.0)
 	var start := Vector3(x, y, -40.0)
@@ -79,11 +80,12 @@ func _spawn_meteorite() -> void:
 	if meteors_to_spawn == 0:
 		spawn_timer.stop()
 
+func _on_rock_passed() -> void:
+	rocks_avoided += 1
+	_update_rock_label()
+
 func _update_rock_label() -> void:
-	if meteors_to_spawn > 0:
-		survival_label.text = "Rocks: %d" % meteors_to_spawn
-	else:
-		survival_label.text = "Hold on!"
+	survival_label.text = "Avoided: %d" % rocks_avoided
 
 func _on_player_health_changed(current: int, max_hp: int) -> void:
 	if max_hp <= 0:

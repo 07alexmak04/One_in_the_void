@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" path="res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_roughness.png" id="5_rough"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_meteo"]
-radius = 0.9
+radius = 1.4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
 albedo_texture = ExtResource("3_color")

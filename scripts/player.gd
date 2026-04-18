@@ -32,7 +32,6 @@ func _ready() -> void:
 	add_to_group("player")
 	collision_layer = 1 << 1
 	collision_mask = (1 << 2) | (1 << 4)
-
 func _physics_process(delta: float) -> void:
 	_rifle_timer = max(_rifle_timer - delta, 0.0)
 	_rocket_timer = max(_rocket_timer - delta, 0.0)
