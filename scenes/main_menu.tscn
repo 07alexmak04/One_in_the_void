@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://b1mmenu0void0"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
-[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/menu.wav" id="3_music"]
 
 [node name="MainMenu" type="Control"]
@@ -13,42 +13,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_bg")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="TitleLabel" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 110.0
-offset_bottom = 190.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 72
-text = "ONE IN THE VOID"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SubtitleLabel" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 200.0
-offset_bottom = 240.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.6, 0.7, 0.9, 1)
-theme_override_font_sizes/font_size = 22
-text = "Theme: Losing Control"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="SpaceBG" parent="." instance=ExtResource("2_spbg")]
+show_debris = true
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -60,7 +26,19 @@ grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
+alignment = 1
 theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 72
+text = "ONE IN THE VOID"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
 
 [node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(300, 64)
@@ -72,7 +50,7 @@ text = "Start"
 custom_minimum_size = Vector2(300, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Custom Spaceship"
+text = "Hangar"
 
 [node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(300, 64)

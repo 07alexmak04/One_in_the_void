@@ -242,7 +242,7 @@ func _update_conditions() -> void:
 	var hp_left: int = max_hits - hits_taken
 	var pct: float = float(hp_left) / float(max_hits)
 
-	var was_critical := _has_critical
+	var _was_critical := _has_critical
 
 	_has_drift    = pct < 0.75
 	_has_jitter   = pct < 0.50

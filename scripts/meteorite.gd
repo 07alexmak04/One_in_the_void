@@ -133,7 +133,7 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 		mat.normal_enabled = true
 		mat.normal_texture = _STONE_NORMAL
 		mat.roughness_texture = _STONE_ROUGH
-		mat.roughness_texture_channel = 0
+		mat.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mi.set_surface_override_material(0, mat)
 		var sz := rng.randf_range(0.18, 0.42)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://b1mmvict0void"]
 
 [ext_resource type="Script" path="res://scripts/victory.gd" id="1_vic"]
-[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/meet-the-princess.wav" id="3_music"]
 
 [sub_resource type="Environment" id="Env_unlock"]
@@ -20,16 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vic")
 
-[node name="BG" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_bg")
-expand_mode = 1
-stretch_mode = 6
+[node name="SpaceBG" parent="." instance=ExtResource("2_spbg")]
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1

@@ -26,7 +26,7 @@ func _ready() -> void:
 	spawn_remaining = cfg["survival_time"]
 	level_label.text = "Level: %s" % cfg["name"]
 
-	player.configure(int(cfg["max_hits"]))
+	player.configure(int(cfg["max_hits"]), 1)
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
 	_on_player_health_changed(int(cfg["max_hits"]), int(cfg["max_hits"]))

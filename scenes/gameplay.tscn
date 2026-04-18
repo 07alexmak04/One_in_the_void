@@ -1,34 +1,16 @@
-[gd_scene load_steps=12 format=3 uid="uid://b1mmplay0void"]
+[gd_scene load_steps=8 format=3 uid="uid://b1mmplay0void"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gp"]
 [ext_resource type="PackedScene" uid="uid://b1mmplayer0void" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/battle.wav" id="3_music"]
-[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="4_bg"]
-
-[sub_resource type="StandardMaterial3D" id="BgMaterial_void"]
-shading_mode = 2
-albedo_texture = ExtResource("4_bg")
-
-[sub_resource type="QuadMesh" id="BgMesh_void"]
-size = Vector2(160, 90)
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_void"]
-sky_top_color = Color(0.02, 0.01, 0.06, 1)
-sky_horizon_color = Color(0.05, 0.02, 0.1, 1)
-ground_bottom_color = Color(0.01, 0.01, 0.03, 1)
-ground_horizon_color = Color(0.04, 0.02, 0.08, 1)
-sun_angle_max = 90.0
-
-[sub_resource type="Sky" id="Sky_void"]
-sky_material = SubResource("ProceduralSkyMaterial_void")
+[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="5_spbg"]
 
 [sub_resource type="Environment" id="Environment_void"]
-background_mode = 2
-sky = SubResource("Sky_void")
+background_mode = 3
 ambient_light_source = 2
 ambient_light_color = Color(0.72, 0.68, 0.62, 1)
-ambient_light_sky_contribution = 0.15
-ambient_light_energy = 0.55
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.7
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.4
@@ -78,10 +60,10 @@ fov = 70.0
 [node name="SpawnTimer" type="Timer" parent="."]
 wait_time = 0.9
 
-[node name="Background" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -41)
-mesh = SubResource("BgMesh_void")
-surface_material_override/0 = SubResource("BgMaterial_void")
+[node name="BGLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="SpaceBG" parent="BGLayer" instance=ExtResource("5_spbg")]
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
