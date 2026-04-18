@@ -8,11 +8,26 @@ var direction: Vector3 = Vector3(0, 0, -1)
 var _life: float = 0.0
 
 func _ready() -> void:
-	# Player projectile on layer 4, hits enemies on layer 3.
 	collision_layer = 1 << 3
 	collision_mask = 1 << 2
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
+	var glow := OmniLight3D.new()
+	glow.omni_range = 3.5
+	glow.light_energy = 5.0
+	glow.light_color = Color(1.0, 0.75, 0.2)
+	add_child(glow)
+	_apply_missile_material(self)
+
+func _apply_missile_material(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mat := StandardMaterial3D.new()
+		mat.albedo_texture = load("res://reference/Rockets Missiles and Bombs - AurynSky/Textures/Red.png")
+		mat.metallic = 0.4
+		mat.roughness = 0.35
+		node.material_override = mat
+	for child in node.get_children():
+		_apply_missile_material(child)
 
 func _physics_process(delta: float) -> void:
 	global_position += direction * speed * delta
