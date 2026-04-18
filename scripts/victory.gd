@@ -1,6 +1,8 @@
 extends Control
 
 @onready var message_label: Label = $CenterContainer/VBox/MessageLabel
+@onready var time_label: Label = $CenterContainer/VBox/TimeLabel
+@onready var stars_label: Label = $CenterContainer/VBox/StarsLabel
 @onready var unlock_label: Label = $CenterContainer/VBox/UnlockLabel
 @onready var unlock_preview: SubViewportContainer = $CenterContainer/VBox/UnlockPreview
 @onready var preview_root: Node3D = $CenterContainer/VBox/UnlockPreview/SubViewport/PreviewScene/ModelRoot
@@ -13,6 +15,14 @@ var _spin_time: float = 0.0
 func _ready() -> void:
 	var cleared_name: String = GameState.get_config()["name"]
 	message_label.text = "Congratulations!\nYou cleared %s." % cleared_name
+
+	# Show time and stars.
+	var t := GameState.last_time_used
+	var mins := int(t) / 60
+	var secs := int(t) % 60
+	time_label.text = "Time: %d:%02d" % [mins, secs]
+	var star_count := GameState.last_stars
+	stars_label.text = _star_string(star_count)
 
 	# Unlock skin reward.
 	var new_skin_name := GameState.unlock_skin_for_level(GameState.current_difficulty)
@@ -35,8 +45,16 @@ func _process(delta: float) -> void:
 	if is_instance_valid(_preview_instance):
 		_preview_instance.rotation.y = _spin_time * 1.2
 
+func _star_string(count: int) -> String:
+	var filled := ""
+	for i in 5:
+		if i < count:
+			filled += "★"
+		else:
+			filled += "☆"
+	return filled
+
 func _show_unlocked_ship(skin_name: String) -> void:
-	# Find the skin data by name.
 	var skin: Dictionary = {}
 	for s in GameState.SHIP_SKINS:
 		if s["name"] == skin_name:

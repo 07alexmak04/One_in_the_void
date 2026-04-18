@@ -64,7 +64,7 @@ const PREFERRED_MALE_VOICES := [
 @onready var alert_overlay: ColorRect = $AlertFlash
 @onready var scanline_rect: ColorRect = $Scanlines
 @onready var page_indicator: Label = $DialogueArea/BubblePanel/MarginContainer/VBox/PageIndicator
-@onready var dark_overlay: ColorRect = $DarkOvertlay
+@onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var status_label: Label = $StatusLabel
 @onready var top_bar: PanelContainer = $TopBar
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
@@ -273,8 +273,9 @@ func _show_dialogue(index: int) -> void:
 	_alert_pulsing = d["flash_pulse"]
 
 	# Darken background progressively — tunnel vision.
-	var tween := create_tween()
-	tween.tween_property(dark_overlay, "color", Color(0, 0, 0, d["bg_darkness"]), 0.5)
+	if dark_overlay:
+		var tween := create_tween()
+		tween.tween_property(dark_overlay, "color", Color(0, 0, 0, d["bg_darkness"]), 0.5)
 
 	# Bubble border color shift — from calm blue to alarm red.
 	var bubble_style: StyleBoxFlat = bubble_panel.get_theme_stylebox("panel").duplicate()

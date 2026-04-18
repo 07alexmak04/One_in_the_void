@@ -38,7 +38,14 @@ func _physics_process(delta: float) -> void:
 	global_position += velocity * delta
 	if is_instance_valid(mesh):
 		mesh.rotate(spin_axis, spin_speed * delta)
-	if global_position.z > 18.0:
+	# Despawn when far from any player (open world).
+	var players := get_tree().get_nodes_in_group("player")
+	if players.size() > 0 and is_instance_valid(players[0]):
+		var dist := global_position.distance_to(players[0].global_position)
+		if dist > 50.0 or global_position.z > 18.0:
+			emit_signal("passed")
+			queue_free()
+	elif global_position.z > 18.0:
 		emit_signal("passed")
 		queue_free()
 
@@ -133,7 +140,7 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 		mat.normal_enabled = true
 		mat.normal_texture = _STONE_NORMAL
 		mat.roughness_texture = _STONE_ROUGH
-		mat.roughness_texture_channel = 0
+		mat.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mi.set_surface_override_material(0, mat)
 		var sz := rng.randf_range(0.18, 0.42)

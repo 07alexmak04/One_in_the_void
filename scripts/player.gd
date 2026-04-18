@@ -170,8 +170,7 @@ func _physics_process(delta: float) -> void:
 	velocity = input_vec * effective_speed
 	move_and_slide()
 
-	global_position.x = clamp(global_position.x, -bounds.x, bounds.x)
-	global_position.y = clamp(global_position.y, -bounds.y, bounds.y)
+	# No bounds — open world, camera follows.
 	global_position.z = 0.0
 
 	var target_roll := -input_vec.x * 0.35
@@ -242,7 +241,7 @@ func _update_conditions() -> void:
 	var hp_left: int = max_hits - hits_taken
 	var pct: float = float(hp_left) / float(max_hits)
 
-	var was_critical := _has_critical
+	var _was_critical := _has_critical
 
 	_has_drift    = pct < 0.75
 	_has_jitter   = pct < 0.50

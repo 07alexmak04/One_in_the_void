@@ -23,10 +23,10 @@ func _physics_process(delta: float) -> void:
 	if _life > life_time:
 		_explode()
 
-func _on_body_entered(body: Node) -> void:
+func _on_body_entered(_body: Node) -> void:
 	_explode()
 
-func _on_area_entered(area: Area3D) -> void:
+func _on_area_entered(_area: Area3D) -> void:
 	_explode()
 
 func _explode() -> void:
