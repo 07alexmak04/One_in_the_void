@@ -1,6 +1,8 @@
 extends Control
 
 @onready var quit_button: Button = $CenterContainer/VBox/QuitButton
+@onready var time_label: Label = $CenterContainer/VBox/TimeLabel
+@onready var stars_label: Label = $CenterContainer/VBox/StarsLabel
 @onready var unlock_label: Label = $CenterContainer/VBox/UnlockLabel
 @onready var unlock_preview: SubViewportContainer = $CenterContainer/VBox/UnlockPreview
 @onready var preview_root: Node3D = $CenterContainer/VBox/UnlockPreview/SubViewport/PreviewScene/ModelRoot
@@ -9,6 +11,13 @@ var _preview_instance: Node3D = null
 var _spin_time: float = 0.0
 
 func _ready() -> void:
+	var t := GameState.last_time_used
+	var mins := int(t) / 60
+	var secs := int(t) % 60
+	time_label.text = "Time: %d:%02d" % [mins, secs]
+	var star_count := GameState.last_stars
+	stars_label.text = _star_string(star_count)
+
 	var new_skin_name := GameState.unlock_skin_for_level(GameState.Difficulty.HARD)
 	if new_skin_name != "":
 		unlock_label.text = "LEGENDARY SHIP UNLOCKED: %s" % new_skin_name
@@ -24,6 +33,15 @@ func _process(delta: float) -> void:
 	_spin_time += delta
 	if is_instance_valid(_preview_instance):
 		_preview_instance.rotation.y = _spin_time * 1.2
+
+func _star_string(count: int) -> String:
+	var filled := ""
+	for i in 5:
+		if i < count:
+			filled += "★"
+		else:
+			filled += "☆"
+	return filled
 
 func _show_unlocked_ship(skin_name: String) -> void:
 	var skin: Dictionary = {}

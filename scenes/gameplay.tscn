@@ -1,9 +1,23 @@
-[gd_scene load_steps=8 format=3 uid="uid://b1mmplay0void"]
+[gd_scene load_steps=12 format=3 uid="uid://b1mmplay0void"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gp"]
 [ext_resource type="PackedScene" uid="uid://b1mmplayer0void" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/battle.wav" id="3_music"]
 [ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="5_spbg"]
+[ext_resource type="Script" path="res://scripts/minimap.gd" id="6_minimap"]
+
+[sub_resource type="TorusMesh" id="TorusMesh_wp"]
+inner_radius = 1.8
+outer_radius = 2.2
+rings = 16
+ring_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="WPMaterial"]
+albedo_color = Color(1, 0.85, 0.3, 0.7)
+emission_enabled = true
+emission = Color(1, 0.8, 0.2, 1)
+emission_energy_multiplier = 2.0
+transparency = 1
 
 [sub_resource type="Environment" id="Environment_void"]
 background_mode = 3
@@ -93,20 +107,30 @@ theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "Level: Beginner"
 
-[node name="SurvivalLabel" type="Label" parent="HUD/TopPanel"]
+[node name="TimeLabel" type="Label" parent="HUD/TopPanel"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -120.0
+offset_left = -60.0
 offset_top = 12.0
-offset_right = 120.0
+offset_right = 60.0
 offset_bottom = 44.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
-theme_override_font_sizes/font_size = 22
-text = "Rocks: 15"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "0:00"
 horizontal_alignment = 1
+
+[node name="WaypointLabel" type="Label" parent="HUD/TopPanel"]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 32.0
+offset_right = 200.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "0 / 5"
 
 [node name="HealthBar" type="ProgressBar" parent="HUD/TopPanel"]
 layout_mode = 1
@@ -233,6 +257,30 @@ custom_minimum_size = Vector2(240, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Quit to Menu"
+
+[node name="Minimap" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -152.0
+offset_right = 192.0
+offset_bottom = -12.0
+grow_vertical = 0
+script = ExtResource("6_minimap")
+
+[node name="WaypointMarker" type="Node3D" parent="."]
+
+[node name="Ring" type="MeshInstance3D" parent="WaypointMarker"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+mesh = SubResource("TorusMesh_wp")
+surface_material_override/0 = SubResource("WPMaterial")
+
+[node name="Light" type="OmniLight3D" parent="WaypointMarker"]
+light_color = Color(1, 0.85, 0.3, 1)
+light_energy = 2.0
+omni_range = 5.0
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_music")

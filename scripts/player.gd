@@ -170,8 +170,7 @@ func _physics_process(delta: float) -> void:
 	velocity = input_vec * effective_speed
 	move_and_slide()
 
-	global_position.x = clamp(global_position.x, -bounds.x, bounds.x)
-	global_position.y = clamp(global_position.y, -bounds.y, bounds.y)
+	# No bounds — open world, camera follows.
 	global_position.z = 0.0
 
 	var target_roll := -input_vec.x * 0.35

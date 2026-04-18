@@ -41,6 +41,20 @@ theme_override_font_sizes/font_size = 44
 text = "Congratulations!"
 horizontal_alignment = 1
 
+[node name="TimeLabel" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "Time: 0:00"
+horizontal_alignment = 1
+
+[node name="StarsLabel" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 36
+text = "★★★★★"
+horizontal_alignment = 1
+
 [node name="UnlockLabel" type="Label" parent="CenterContainer/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)

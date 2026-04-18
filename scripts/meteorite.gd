@@ -38,7 +38,14 @@ func _physics_process(delta: float) -> void:
 	global_position += velocity * delta
 	if is_instance_valid(mesh):
 		mesh.rotate(spin_axis, spin_speed * delta)
-	if global_position.z > 18.0:
+	# Despawn when far from any player (open world).
+	var players := get_tree().get_nodes_in_group("player")
+	if players.size() > 0 and is_instance_valid(players[0]):
+		var dist := global_position.distance_to(players[0].global_position)
+		if dist > 50.0 or global_position.z > 18.0:
+			emit_signal("passed")
+			queue_free()
+	elif global_position.z > 18.0:
 		emit_signal("passed")
 		queue_free()
 
