@@ -14,13 +14,14 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var pause_panel: Control = $HUD/PausePanel
 @onready var resume_button: Button = $HUD/PausePanel/VBox/ResumeButton
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var camera: Camera3D = $Camera3D
 @onready var world_env: WorldEnvironment = $WorldEnvironment
 @onready var background: MeshInstance3D = $Background
 
 var cfg: Dictionary
-var spawn_remaining: float = 0.0
-var spawning_done: bool = false
+var meteors_to_spawn: int = 0
+var rocks_avoided: int = 0
 var finished: bool = false
 
 var _hit_flash: ColorRect = null
@@ -33,14 +34,12 @@ var _base_glow: float = 0.4
 var _health_pulse_tween: Tween = null
 
 func _ready() -> void:
-	# Allow _process to run even when the scene tree is paused,
-	# so the Escape key can toggle pause off again.
 	process_mode = Node.PROCESS_MODE_ALWAYS
-
 	randomize()
 	cfg = GameState.get_config()
-	spawn_remaining = cfg["survival_time"]
+	meteors_to_spawn = int(cfg["meteor_count"])
 	level_label.text = "Level: %s" % cfg["name"]
+	_update_rock_label()
 	_camera_origin = camera.position
 
 	_env = world_env.environment
@@ -53,7 +52,7 @@ func _ready() -> void:
 	_build_health_style()
 	_build_starfield()
 
-	player.configure(int(cfg["max_hits"]), 1)
+	player.configure(int(cfg["max_hits"]), int(cfg["hit_damage"]))
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
 	player.got_hit.connect(_on_player_got_hit)
@@ -69,6 +68,7 @@ func _ready() -> void:
 	go_quit_button.pressed.connect(_on_quit_to_menu)
 	resume_button.pressed.connect(_on_resume)
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
+	music_player.finished.connect(music_player.play)
 
 func _build_health_style() -> void:
 	_health_fill_style = StyleBoxFlat.new()
@@ -93,13 +93,11 @@ func _build_hit_flash() -> void:
 
 func _build_starfield() -> void:
 	var speed_mult := 1.0 + GameState.current_difficulty * 0.4
-
 	var particles := GPUParticles3D.new()
 	particles.amount = 320
 	particles.lifetime = 2.2
 	particles.preprocess = 2.2
 	particles.randomness = 0.5
-
 	var mat := ParticleProcessMaterial.new()
 	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	mat.emission_box_extents = Vector3(18.0, 11.0, 24.0)
@@ -110,7 +108,6 @@ func _build_starfield() -> void:
 	mat.gravity = Vector3.ZERO
 	mat.scale_min = 0.4
 	mat.scale_max = 1.3
-
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.08, 0.82, 1.0])
 	grad.colors = PackedColorArray([
@@ -122,15 +119,12 @@ func _build_starfield() -> void:
 	var grad_tex := GradientTexture1D.new()
 	grad_tex.gradient = grad
 	mat.color_ramp = grad_tex
-
 	particles.process_material = mat
-
 	var mesh := SphereMesh.new()
 	mesh.radius = 0.07
 	mesh.height = 0.14
 	mesh.radial_segments = 4
 	mesh.rings = 2
-
 	var star_mat := StandardMaterial3D.new()
 	star_mat.emission_enabled = true
 	star_mat.emission = Color(0.85, 0.92, 1.0)
@@ -138,7 +132,6 @@ func _build_starfield() -> void:
 	star_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	star_mat.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 	mesh.surface_set_material(0, star_mat)
-
 	particles.draw_pass_1 = mesh
 	particles.position = Vector3(0.0, 0.0, -20.0)
 	add_child(particles)
@@ -189,50 +182,46 @@ func _do_explosion_ambient_pulse() -> void:
 	tw.tween_property(_env, "ambient_light_energy", _base_ambient_energy, 0.5)
 	tw.tween_property(_env, "glow_intensity", _base_glow, 0.5)
 
-func _process(delta: float) -> void:
-	# Handle pause toggle first so Escape works even while paused.
-	# Don't allow pausing after the game has ended.
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("pause") and not finished:
 		_toggle_pause()
 		return
-
 	if finished or get_tree().paused:
 		return
-
-	if not spawning_done:
-		spawn_remaining = max(spawn_remaining - delta, 0.0)
-		survival_label.text = "Incoming: %0.1fs" % spawn_remaining
-		if spawn_remaining <= 0.0:
-			spawning_done = true
-			spawn_timer.stop()
-	else:
-		var rocks_left := get_tree().get_nodes_in_group("meteorite").size()
-		survival_label.text = "Rocks left: %d" % rocks_left
-		if rocks_left == 0:
-			_on_level_cleared()
-
-	# Parallax: background drifts opposite to player
+	if meteors_to_spawn == 0 and get_tree().get_nodes_in_group("meteorite").is_empty():
+		_on_level_cleared()
 	background.position.x = -player.global_position.x * 0.08
 	background.position.y = -player.global_position.y * 0.06
 
 func _spawn_meteorite() -> void:
-	if finished or spawning_done:
+	if finished or meteors_to_spawn <= 0:
 		return
+	meteors_to_spawn -= 1
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
+	m.passed.connect(_on_rock_passed)
 	m.exploded.connect(_on_explosion)
 	var x := randf_range(-13.0, 13.0)
 	var y := randf_range(-7.0, 7.0)
 	var start := Vector3(x, y, -40.0)
 	var target := Vector3(
-		player.global_position.x + randf_range(-4.0, 4.0),
-		player.global_position.y + randf_range(-3.0, 3.0),
+		player.global_position.x + randf_range(-8.0, 8.0),
+		player.global_position.y + randf_range(-6.0, 6.0),
 		0.0
 	)
 	var dir := (target - start).normalized()
 	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2)
-	var hp := 2 + (GameState.current_difficulty)
+	var hp := 2 + GameState.current_difficulty
 	m.configure(start, dir * speed, hp)
+	if meteors_to_spawn == 0:
+		spawn_timer.stop()
+
+func _on_rock_passed() -> void:
+	rocks_avoided += 1
+	_update_rock_label()
+
+func _update_rock_label() -> void:
+	survival_label.text = "Avoided: %d" % rocks_avoided
 
 func _on_player_health_changed(current: int, max_hp: int) -> void:
 	if max_hp <= 0:
@@ -252,9 +241,7 @@ func _on_player_health_changed(current: int, max_hp: int) -> void:
 	if _vignette:
 		_vignette.color.a = danger * 0.32
 	if _env:
-		var base_color := Color(0.72, 0.68, 0.62)
-		var red_color := Color(0.85, 0.18, 0.12)
-		_env.ambient_light_color = base_color.lerp(red_color, danger * 0.65)
+		_env.ambient_light_color = Color(0.72, 0.68, 0.62).lerp(Color(0.85, 0.18, 0.12), danger * 0.65)
 	if pct <= 0.25:
 		if _health_pulse_tween == null or not _health_pulse_tween.is_running():
 			_health_pulse_tween = create_tween().set_loops()
@@ -276,6 +263,8 @@ func _on_player_died() -> void:
 func _on_level_cleared() -> void:
 	finished = true
 	spawn_timer.stop()
+	var newly: String = GameState.unlock_skin_for_difficulty(GameState.current_difficulty)
+	GameState.save_prefs()
 	if GameState.has_next_level():
 		get_tree().change_scene_to_file("res://scenes/victory.tscn")
 	else:

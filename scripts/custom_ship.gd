@@ -117,6 +117,7 @@ func _on_select() -> void:
 	var skin: Dictionary = GameState.SHIP_SKINS[current_skin_index]
 	if GameState.is_skin_unlocked(skin["id"]):
 		GameState.selected_skin = skin["id"]
+		GameState.save_prefs()
 		_build_grid()
 		_show_skin(current_skin_index)
 
