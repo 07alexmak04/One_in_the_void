@@ -10,7 +10,7 @@ shading_mode = 2
 albedo_texture = ExtResource("4_bg")
 
 [sub_resource type="QuadMesh" id="BgMesh_void"]
-size = Vector2(64, 36)
+size = Vector2(160, 90)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_void"]
 sky_top_color = Color(0.02, 0.01, 0.06, 1)
@@ -53,7 +53,7 @@ fov = 70.0
 wait_time = 0.9
 
 [node name="Background" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -41)
 mesh = SubResource("BgMesh_void")
 surface_material_override/0 = SubResource("BgMaterial_void")
 

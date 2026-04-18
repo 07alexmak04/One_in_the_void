@@ -1,10 +1,20 @@
-[gd_scene load_steps=3 format=3 uid="uid://b1mmmeteo0void"]
+[gd_scene load_steps=8 format=3 uid="uid://b1mmmeteo0void"]
 
 [ext_resource type="Script" path="res://scripts/meteorite.gd" id="1_meteo"]
-[ext_resource type="PackedScene" path="res://reference/Stones/STONE#1/STONE#1.fbx" id="2_stone"]
+[ext_resource type="Mesh" path="res://reference/Stones/STONE#1/STONE#1.obj" id="2_stone_mesh"]
+[ext_resource type="Texture2D" path="res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_color.png" id="3_color"]
+[ext_resource type="Texture2D" path="res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_normal.png" id="4_normal"]
+[ext_resource type="Texture2D" path="res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_roughness.png" id="5_rough"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_meteo"]
 radius = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_texture = ExtResource("3_color")
+normal_enabled = true
+normal_texture = ExtResource("4_normal")
+roughness_texture = ExtResource("5_rough")
+roughness_texture_channel = 0
 
 [node name="Meteorite" type="Area3D"]
 script = ExtResource("1_meteo")
@@ -13,6 +23,6 @@ script = ExtResource("1_meteo")
 shape = SubResource("SphereShape3D_meteo")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
-
-[node name="StoneModel" parent="Mesh" instance=ExtResource("2_stone")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("2_stone_mesh")
+surface_material_override/0 = SubResource("StandardMaterial3D_stone")
