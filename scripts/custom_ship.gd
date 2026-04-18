@@ -109,7 +109,7 @@ func _load_preview(skin: Dictionary) -> void:
 	var model_scene = load(skin["model"])
 	if model_scene:
 		_preview_instance = model_scene.instantiate()
-		var s: float = skin.get("scale", 0.1) * 0.35
+		var s: float = skin.get("scale", 0.1) * 0.8
 		_preview_instance.scale = Vector3(s, s, s)
 		
 		var tex = load(skin["texture"])

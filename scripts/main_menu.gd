@@ -4,14 +4,19 @@ extends Node3D
 @onready var custom_ship_button: Button = $CanvasLayer/UI/MenuContainer/CustomShipButton
 @onready var quit_button: Button = $CanvasLayer/UI/MenuContainer/QuitButton
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
-@onready var ship_placeholder: Node3D = $ShipPreviewPivot/ShipPlaceholder
-@onready var ship_pivot: Node3D = $ShipPreviewPivot
-@onready var planet_pivot: Node3D = $PlanetPivot
-@onready var planet_placeholder: Node3D = $PlanetPivot/PlanetPlaceholder
+@onready var viewport: SubViewport = $SubViewport
+@onready var viewport_texture_rect: TextureRect = $CanvasLayer/UI/MainViewportTexture
+@onready var ship_placeholder: Node3D = $SubViewport/PreviewScene/ShipPreviewPivot/ShipPlaceholder
+@onready var ship_pivot: Node3D = $SubViewport/PreviewScene/ShipPreviewPivot
+@onready var planet_pivot: Node3D = $SubViewport/PreviewScene/PlanetPivot
+@onready var planet_placeholder: Node3D = $SubViewport/PreviewScene/PlanetPivot/PlanetPlaceholder
 
 var _time: float = 0.0
 
 func _ready() -> void:
+	# Link the viewport to the texture rect
+	viewport_texture_rect.texture = viewport.get_texture()
+	
 	start_button.pressed.connect(_on_start_pressed)
 	custom_ship_button.pressed.connect(_on_custom_ship_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
@@ -50,7 +55,7 @@ func _load_ship_preview() -> void:
 	var model_scene = load(skin_data["model"])
 	if model_scene:
 		var instance: Node3D = model_scene.instantiate()
-		var s: float = skin_data["scale"] * 3.0
+		var s: float = skin_data["scale"] * 1.3
 		instance.transform = Transform3D(
 			Vector3(0, 0, s), Vector3(0, s, 0), Vector3(-s, 0, 0),
 			Vector3.ZERO

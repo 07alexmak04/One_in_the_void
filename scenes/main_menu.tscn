@@ -1,71 +1,51 @@
-[gd_scene load_steps=12 format=3 uid="uid://b1mmenu0void0"]
+[gd_scene load_steps=12 format=3 uid="uid://b1mmmenu0void"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
-[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
-[ext_resource type="AudioStream" path="res://reference/Space Music Pack/menu.wav" id="3_music"]
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_menu"]
-sky_top_color = Color(0.02, 0.01, 0.06, 1)
-sky_horizon_color = Color(0.05, 0.02, 0.1, 1)
-ground_bottom_color = Color(0.01, 0.01, 0.03, 1)
-ground_horizon_color = Color(0.04, 0.02, 0.08, 1)
-
-[sub_resource type="Sky" id="Sky_menu"]
-sky_material = SubResource("ProceduralSkyMaterial_menu")
+[ext_resource type="PackedScene" uid="uid://b1mmspacebg0v" path="res://scenes/space_bg.tscn" id="2_spbg"]
 
 [sub_resource type="Environment" id="Environment_menu"]
-background_mode = 2
-sky = SubResource("Sky_menu")
+background_mode = 3
 ambient_light_source = 2
-ambient_light_color = Color(0.65, 0.7, 0.8, 1)
-ambient_light_energy = 0.4
+ambient_light_color = Color(0.65, 0.75, 1, 1)
+ambient_light_energy = 0.5
 glow_enabled = true
 glow_intensity = 0.6
+glow_strength = 1.1
 glow_bloom = 0.1
-glow_blend_mode = 0
-tonemap_mode = 2
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.06, 0.1, 0.2, 0.5)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.6, 1, 0.4)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-expand_margin_left = 2.0
-expand_margin_top = 2.0
-expand_margin_right = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.1, 0.2, 0.4, 0.65)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.4, 0.8, 1, 0.9)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-expand_margin_left = 4.0
-expand_margin_top = 4.0
-expand_margin_right = 4.0
-expand_margin_bottom = 4.0
-shadow_color = Color(0.3, 0.7, 1, 0.2)
-shadow_size = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.04, 0.06, 0.12, 0.8)
+bg_color = Color(0.1, 0.25, 0.45, 0.6)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.2, 0.4, 0.8, 1)
+border_color = Color(0.4, 0.8, 1, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.05, 0.15, 0.3, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.6, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0, 0, 0, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.8, 0.35)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
@@ -77,51 +57,55 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(1, 1, 1, 0.3)
+border_color = Color(0.5, 0.8, 1, 0.5)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 6.0
 
 [node name="MainMenuRoot" type="Node3D"]
 script = ExtResource("1_menu")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_menu")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 5, 5, 5)
-light_energy = 1.2
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6)
-fov = 60.0
-
-[node name="PlanetPivot" type="Node3D" parent="."]
-transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -8, 2, -18)
-
-[node name="PlanetPlaceholder" type="Node3D" parent="PlanetPivot"]
-
-[node name="ShipPreviewPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.4, 0.5)
-
-[node name="ShipPlaceholder" type="Node3D" parent="ShipPreviewPivot"]
-
-[node name="ShipLight" type="OmniLight3D" parent="ShipPreviewPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 2)
-light_color = Color(0.7, 0.9, 1, 1)
-light_energy = 4.0
-omni_range = 10.0
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -1
 
 [node name="SpaceBG" parent="BackgroundLayer" instance=ExtResource("2_spbg")]
 show_debris = true
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="PreviewScene" type="Node3D" parent="SubViewport"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/PreviewScene"]
+environment = SubResource("Environment_menu")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 5, 5, 5)
+light_energy = 1.5
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8.5)
+fov = 45.0
+
+[node name="PlanetPivot" type="Node3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -8, 2, -18)
+
+[node name="PlanetPlaceholder" type="Node3D" parent="SubViewport/PreviewScene/PlanetPivot"]
+
+[node name="ShipPreviewPivot" type="Node3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.2, 0)
+
+[node name="ShipPlaceholder" type="Node3D" parent="SubViewport/PreviewScene/ShipPreviewPivot"]
+
+[node name="ShipLight" type="OmniLight3D" parent="SubViewport/PreviewScene/ShipPreviewPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 2)
+light_color = Color(0.7, 0.9, 1, 1)
+light_energy = 5.0
+omni_range = 10.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -132,6 +116,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="MainViewportTexture" type="TextureRect" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="TitleLabel" type="Label" parent="CanvasLayer/UI"]
 layout_mode = 1
@@ -207,7 +202,5 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "Quit Game"
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_music")
+process_mode = 3
 autoplay = true
-volume_db = -8.0
- Maryland
