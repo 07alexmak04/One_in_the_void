@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://b1mmplay0void"]
+[gd_scene load_steps=15 format=3 uid="uid://b1mmplay0void"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gp"]
 [ext_resource type="PackedScene" uid="uid://b1mmplayer0void" path="res://scenes/player.tscn" id="2_player"]
@@ -55,6 +55,25 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_bg"]
+bg_color = Color(0.05, 0.1, 0.2, 0.7)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.4, 0.8, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_cd"]
+bg_color = Color(0.2, 0.5, 1.0, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="Gameplay" type="Node3D"]
 script = ExtResource("1_gp")
 
@@ -69,15 +88,18 @@ light_energy = 0.8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
 fov = 70.0
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="World" type="Node3D" parent="."]
+process_mode = 1
 
-[node name="SpawnTimer" type="Timer" parent="."]
+[node name="Player" parent="World" instance=ExtResource("2_player")]
+
+[node name="SpawnTimer" type="Timer" parent="World"]
 wait_time = 0.9
 
-[node name="BGLayer" type="CanvasLayer" parent="."]
-layer = -1
-
-[node name="SpaceBG" parent="BGLayer" instance=ExtResource("5_spbg")]
+[node name="Background" type="MeshInstance3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -41)
+mesh = SubResource("BgMesh_void")
+surface_material_override/0 = SubResource("BgMaterial_void")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -148,6 +170,65 @@ show_percentage = false
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
 theme_override_styles/over = SubResource("StyleBoxFlat_hp_border")
+
+[node name="SkillPanel" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -330.0
+offset_top = -100.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="BG" type="Panel" parent="HUD/SkillPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_skill_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/SkillPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -28.0
+offset_right = 140.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="SkillName" type="Label" parent="HUD/SkillPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Skill: Quantum Blink (Q)"
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="HUD/SkillPanel/VBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_skill_cd")
+value = 100.0
+show_percentage = false
+
+[node name="ReadyLabel" type="Label" parent="HUD/SkillPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.4, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "READY"
+horizontal_alignment = 1
 
 [node name="GameOverPanel" type="Control" parent="HUD"]
 layout_mode = 3

@@ -1,43 +1,32 @@
 [gd_scene format=3 uid="uid://cniaxmpxjuj4v"]
 
 [ext_resource type="Script" path="res://scripts/custom_ship.gd" id="1_cs"]
-[ext_resource type="PackedScene" path="res://scenes/space_bg.tscn" id="2_spbg"]
+[ext_resource type="Texture2D" path="res://reference/minimalist_showroom.png" id="2_bg"]
 [ext_resource type="AudioStream" path="res://reference/Space Music Pack/slow-travel.wav" id="3_music"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
-bg_color = Color(0.04, 0.08, 0.16, 0.85)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.29, 0.76, 1, 0.4)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_preview"]
-bg_color = Color(0.02, 0.04, 0.1, 0.9)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
+bg_color = Color(0.02, 0.05, 0.1, 0.6)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.29, 0.76, 1, 0.3)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 10
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
 
 [sub_resource type="Environment" id="Environment_preview"]
-background_mode = 1
-background_color = Color(0.04, 0.06, 0.12, 1)
+background_mode = 0
 ambient_light_source = 2
 ambient_light_color = Color(0.4, 0.5, 0.7, 1)
-ambient_light_energy = 0.8
+ambient_light_energy = 1.0
 
 [node name="CustomShip" type="Control"]
 layout_mode = 3
@@ -58,116 +47,173 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.35)
+color = Color(0, 0, 0, 0.1)
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="PreviewScene" type="Node3D" parent="SubViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.6, 9.0)
+fov = 40.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/PreviewScene"]
+environment = SubResource("Environment_preview")
+
+[node name="CenterLight" type="OmniLight3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(0.5, 0.8, 1, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="ModelRoot" type="Node3D" parent="SubViewport/PreviewScene"]
+
+[node name="ShipShowcase" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.1)
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="PreviewScene" type="Node3D" parent="SubViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.6, 9.0)
+fov = 40.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/PreviewScene"]
+environment = SubResource("Environment_preview")
+
+[node name="CenterLight" type="OmniLight3D" parent="SubViewport/PreviewScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(0.5, 0.8, 1, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="ModelRoot" type="Node3D" parent="SubViewport/PreviewScene"]
+
+[node name="ShipShowcase" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 24.0
-offset_bottom = 72.0
+offset_top = 32.0
+offset_bottom = 80.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 40
-text = "CUSTOM SPACESHIP"
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 36
+text = "SHIP CUSTOMIZATION"
 horizontal_alignment = 1
 
-[node name="Content" type="HBoxContainer" parent="."]
+[node name="SelectionPanel" type="PanelContainer" parent="."]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 120.0
+offset_right = 300.0
+offset_bottom = -120.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="SelectionPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="SelectionPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/v_separation = 12
+columns = 1
+
+[node name="InfoPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 32.0
-offset_top = 84.0
-offset_right = -32.0
-offset_bottom = -72.0
-grow_horizontal = 2
+offset_left = -380.0
+offset_top = 120.0
+offset_right = -40.0
+offset_bottom = -120.0
+grow_horizontal = 0
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Content"]
-custom_minimum_size = Vector2(240, 0)
+[node name="VBox" type="VBoxContainer" parent="InfoPanel"]
 layout_mode = 2
-size_flags_horizontal = 0
+theme_override_constants/separation = 12
 
-[node name="Grid" type="GridContainer" parent="Content/ScrollContainer"]
+[node name="ShipNameLabel" type="Label" parent="InfoPanel/VBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-columns = 1
-theme_override_constants/v_separation = 8
-
-[node name="PreviewPanel" type="PanelContainer" parent="Content"]
-custom_minimum_size = Vector2(420, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 2.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_preview")
-
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Content/PreviewPanel"]
-layout_mode = 2
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="Content/PreviewPanel/SubViewportContainer"]
-transparent_bg = true
-handle_input_locally = false
-size = Vector2i(420, 500)
-render_target_update_mode = 4
-
-[node name="PreviewScene" type="Node3D" parent="Content/PreviewPanel/SubViewportContainer/SubViewport"]
-
-[node name="Camera3D" type="Camera3D" parent="Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene"]
-transform = Transform3D(1, 0, 0, 0, 0.95, 0.3, 0, -0.3, 0.95, 0, 1.5, 5)
-fov = 45.0
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene"]
-environment = SubResource("Environment_preview")
-
-[node name="DirLight" type="DirectionalLight3D" parent="Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene"]
-transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 2, 4, 2)
-light_energy = 1.2
-
-[node name="FillLight" type="DirectionalLight3D" parent="Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene"]
-transform = Transform3D(0.866, 0.25, -0.433, 0, 0.866, 0.5, 0.5, -0.433, 0.75, -2, 2, -1)
-light_color = Color(0.6, 0.7, 1, 1)
-light_energy = 0.4
-
-[node name="ModelRoot" type="Node3D" parent="Content/PreviewPanel/SubViewportContainer/SubViewport/PreviewScene"]
-
-[node name="InfoPanel" type="PanelContainer" parent="Content"]
-custom_minimum_size = Vector2(280, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_info")
-
-[node name="VBox" type="VBoxContainer" parent="Content/InfoPanel"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="ShipNameLabel" type="Label" parent="Content/InfoPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.76, 1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 28
 text = "Ship Name"
 
-[node name="DescLabel" type="Label" parent="Content/InfoPanel/VBox"]
+[node name="DescLabel" type="Label" parent="InfoPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.95, 1)
-theme_override_font_sizes/font_size = 16
-text = "Description"
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 15
+text = "Description here..."
 autowrap_mode = 2
 
-[node name="UnlockLabel" type="Label" parent="Content/InfoPanel/VBox"]
+[node name="SkillSeparator" type="HSeparator" parent="InfoPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.6, 0.3, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_constants/separation = 16
+
+[node name="SkillTitle" type="Label" parent="InfoPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "Ability: "
+
+[node name="SkillDesc" type="Label" parent="InfoPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.85, 0.9, 0.9)
+theme_override_font_sizes/font_size = 13
+text = "Description..."
+autowrap_mode = 2
+
+[node name="UnlockLabel" type="Label" parent="InfoPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.5, 0.2, 1)
+theme_override_font_sizes/font_size = 14
 text = ""
 autowrap_mode = 2
 
-[node name="SelectButton" type="Button" parent="Content/InfoPanel/VBox"]
-custom_minimum_size = Vector2(200, 52)
+[node name="Spacer" type="Control" parent="InfoPanel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+size_flags_vertical = 3
+
+[node name="SelectButton" type="Button" parent="InfoPanel/VBox"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "Equip"
 
 [node name="BackButton" type="Button" parent="."]
@@ -175,15 +221,16 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -60.0
-offset_right = 148.0
-offset_bottom = -16.0
+offset_left = 32.0
+offset_top = -80.0
+offset_right = 160.0
+offset_bottom = -32.0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "Back"
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_music")
 autoplay = true
 volume_db = -8.0
+ Maryland

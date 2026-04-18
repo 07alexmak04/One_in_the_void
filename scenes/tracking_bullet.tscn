@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cnirwfjsjuj4v"]
+
+[ext_resource type="Script" path="res://scripts/tracking_bullet.gd" id="1_track"]
+[ext_resource type="PackedScene" uid="uid://boptmsykwahqv" path="res://reference/Rockets Missiles and Bombs - AurynSky/FBX/Rocket2.fbx" id="2_missile"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_track"]
+radius = 0.55
+
+[node name="TrackingMissile" type="Area3D"]
+script = ExtResource("1_track")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_track")
+
+[node name="Mesh" type="Node3D" parent="."]
+
+[node name="MissileModel" parent="Mesh" instance=ExtResource("2_missile")]
+transform = Transform3D(0.25, 0, 0, 0, 0, -0.25, 0, 0.25, 0, 0, 0, 0)

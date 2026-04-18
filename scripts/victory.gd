@@ -25,7 +25,7 @@ func _ready() -> void:
 	stars_label.text = _star_string(star_count)
 
 	# Unlock skin reward.
-	var new_skin_name := GameState.unlock_skin_for_level(GameState.current_difficulty)
+	var new_skin_name: String = GameState.unlock_skin_for_difficulty(GameState.current_difficulty)
 	if new_skin_name != "":
 		unlock_label.text = "NEW SHIP UNLOCKED: %s" % new_skin_name
 		unlock_label.visible = true
