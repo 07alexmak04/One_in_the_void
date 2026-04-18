@@ -340,7 +340,6 @@ func _draw_ship(center: Vector2, sc: float, alpha: float, ship_type: int, facing
 			for t in 5:
 				var tf := float(t) / 5.0
 				var tw := (5.0 - tf * 4.0) * sc
-				var tl := (8.0 + tf * 35.0) * sc
 				draw_line(
 					center + Vector2((-20 - tf * 35) * dir, 0) * sc,
 					center + Vector2((-20 - tf * 35 - 6) * dir, 0) * sc,

@@ -18,6 +18,7 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 var cfg: Dictionary
 var spawn_remaining: float = 0.0
 var spawning_done: bool = false
+var grace_timer: float = 0.0
 var finished: bool = false
 
 func _ready() -> void:
@@ -51,14 +52,18 @@ func _process(delta: float) -> void:
 
 	if not spawning_done:
 		spawn_remaining = max(spawn_remaining - delta, 0.0)
-		survival_label.text = "Incoming: %0.1fs" % spawn_remaining
+		survival_label.text = "%0.0fs" % spawn_remaining
 		if spawn_remaining <= 0.0:
 			spawning_done = true
 			spawn_timer.stop()
+			grace_timer = 3.0  # short grace period to clear remaining rocks
 	else:
-		var rocks_left := get_tree().get_nodes_in_group("meteorite").size()
-		survival_label.text = "Rocks left: %d" % rocks_left
-		if rocks_left == 0:
+		grace_timer = max(grace_timer - delta, 0.0)
+		survival_label.text = ""
+		if grace_timer <= 0.0:
+			# Clear any remaining rocks and end the level.
+			for m in get_tree().get_nodes_in_group("meteorite"):
+				m.queue_free()
 			_on_level_cleared()
 
 func _spawn_meteorite() -> void:
@@ -66,17 +71,66 @@ func _spawn_meteorite() -> void:
 		return
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
-	var x := randf_range(-13.0, 13.0)
-	var y := randf_range(-7.0, 7.0)
-	var start := Vector3(x, y, -40.0)
-	var target := Vector3(
-		player.global_position.x + randf_range(-4.0, 4.0),
-		player.global_position.y + randf_range(-3.0, 3.0),
-		0.0
-	)
-	var dir := (target - start).normalized()
+
 	var speed := float(cfg["meteor_speed"]) * randf_range(0.85, 1.2)
-	var hp := 2 + (GameState.current_difficulty)  # harder levels => tougher rocks
+	var hp := 2 + (GameState.current_difficulty)
+	var roll := randf()
+
+	var start := Vector3.ZERO
+	var target := Vector3.ZERO
+	var player_pos := player.global_position
+	var player_vel := player.velocity if player.velocity.length() > 0.5 else Vector3.ZERO
+
+	if roll < 0.35:
+		# --- Front approach: from deep z, aimed at player with lead prediction ---
+		start = Vector3(randf_range(-13.0, 13.0), randf_range(-7.0, 7.0), -35.0)
+		# Predict where player will be when the rock arrives.
+		var travel_time: float = 35.0 / maxf(speed, 1.0)
+		var predicted := player_pos + player_vel * travel_time * randf_range(0.3, 0.8)
+		target = Vector3(
+			predicted.x + randf_range(-2.0, 2.0),
+			predicted.y + randf_range(-1.5, 1.5),
+			0.0
+		)
+	elif roll < 0.55:
+		# --- Side spawn: from left or right edge ---
+		var from_left := randf() > 0.5
+		var side_x := -16.0 if from_left else 16.0
+		start = Vector3(side_x, randf_range(-7.0, 7.0), randf_range(-8.0, 2.0))
+		target = Vector3(
+			player_pos.x + randf_range(-3.0, 3.0),
+			player_pos.y + randf_range(-2.0, 2.0),
+			0.0
+		)
+	elif roll < 0.7:
+		# --- Top/bottom spawn ---
+		var from_top := randf() > 0.5
+		var side_y := 10.0 if from_top else -10.0
+		start = Vector3(randf_range(-12.0, 12.0), side_y, randf_range(-8.0, 2.0))
+		target = Vector3(
+			player_pos.x + randf_range(-3.0, 3.0),
+			player_pos.y + randf_range(-2.0, 2.0),
+			0.0
+		)
+	elif roll < 0.85:
+		# --- Close fast: spawns closer, less reaction time ---
+		start = Vector3(
+			randf_range(-12.0, 12.0),
+			randf_range(-6.0, 6.0),
+			randf_range(-18.0, -10.0)
+		)
+		target = Vector3(
+			player_pos.x + randf_range(-1.5, 1.5),
+			player_pos.y + randf_range(-1.0, 1.0),
+			0.0
+		)
+		speed *= 1.3
+	else:
+		# --- Random cross: not aimed at player, crosses the play area ---
+		start = Vector3(randf_range(-14.0, 14.0), randf_range(-8.0, 8.0), -30.0)
+		target = Vector3(randf_range(-14.0, 14.0), randf_range(-8.0, 8.0), 10.0)
+
+	var dir := (target - start).normalized()
 	m.configure(start, dir * speed, hp)
 
 func _on_player_health_changed(current: int, max_hp: int) -> void:
