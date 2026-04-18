@@ -14,7 +14,7 @@ func _ready() -> void:
 
 func _on_next_pressed() -> void:
 	GameState.advance_level()
-	get_tree().change_scene_to_file("res://scenes/gameplay.tscn")
+	get_tree().change_scene_to_file("res://scenes/intro_dialogue.tscn")
 
 func _on_quit_pressed() -> void:
 	GameState.reset_progression()

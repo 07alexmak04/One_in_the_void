@@ -13,7 +13,7 @@ func _ready() -> void:
 
 func _start(diff: int) -> void:
 	GameState.set_difficulty(diff)
-	get_tree().change_scene_to_file("res://scenes/gameplay.tscn")
+	get_tree().change_scene_to_file("res://scenes/intro_dialogue.tscn")
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

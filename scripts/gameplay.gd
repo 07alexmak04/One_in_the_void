@@ -16,13 +16,14 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
 
 var cfg: Dictionary
-var survival_remaining: float = 0.0
+var spawn_remaining: float = 0.0
+var spawning_done: bool = false
 var finished: bool = false
 
 func _ready() -> void:
 	randomize()
 	cfg = GameState.get_config()
-	survival_remaining = cfg["survival_time"]
+	spawn_remaining = cfg["survival_time"]
 	level_label.text = "Level: %s" % cfg["name"]
 
 	player.configure(int(cfg["max_hits"]))
@@ -48,13 +49,20 @@ func _process(delta: float) -> void:
 		_toggle_pause()
 		return
 
-	survival_remaining = max(survival_remaining - delta, 0.0)
-	survival_label.text = "Time: %0.1fs" % survival_remaining
-	if survival_remaining <= 0.0:
-		_on_level_cleared()
+	if not spawning_done:
+		spawn_remaining = max(spawn_remaining - delta, 0.0)
+		survival_label.text = "Incoming: %0.1fs" % spawn_remaining
+		if spawn_remaining <= 0.0:
+			spawning_done = true
+			spawn_timer.stop()
+	else:
+		var rocks_left := get_tree().get_nodes_in_group("meteorite").size()
+		survival_label.text = "Rocks left: %d" % rocks_left
+		if rocks_left == 0:
+			_on_level_cleared()
 
 func _spawn_meteorite() -> void:
-	if finished:
+	if finished or spawning_done:
 		return
 	var m := MeteoriteScene.instantiate()
 	add_child(m)
@@ -88,9 +96,6 @@ func _on_player_died() -> void:
 func _on_level_cleared() -> void:
 	finished = true
 	spawn_timer.stop()
-	# Clear remaining rocks so they don't hit the player during transition.
-	for m in get_tree().get_nodes_in_group("meteorite"):
-		m.queue_free()
 	if GameState.has_next_level():
 		get_tree().change_scene_to_file("res://scenes/victory.tscn")
 	else:
