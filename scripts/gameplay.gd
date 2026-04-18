@@ -14,6 +14,7 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var pause_panel: Control = $HUD/PausePanel
 @onready var resume_button: Button = $HUD/PausePanel/VBox/ResumeButton
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
@@ -41,6 +42,7 @@ func _ready() -> void:
 	go_quit_button.pressed.connect(_on_quit_to_menu)
 	resume_button.pressed.connect(_on_resume)
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
+	music_player.finished.connect(music_player.play)
 
 func _process(_delta: float) -> void:
 	if finished:

@@ -29,7 +29,7 @@ func configure(cfg_max_hits: int) -> void:
 	emit_signal("health_changed", max_hits - hits_taken, max_hits)
 
 func _ready() -> void:
-	# Physics layers: player on layer 2, collides with enemy (3) and enemy projectile (5).
+	add_to_group("player")
 	collision_layer = 1 << 1
 	collision_mask = (1 << 2) | (1 << 4)
 
