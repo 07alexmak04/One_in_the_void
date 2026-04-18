@@ -102,39 +102,42 @@ const DIFFICULTY_CONFIGS := {
 		"name": "Beginner",
 		"meteor_count": 15,
 		"meteor_spawn_interval": 1.1,
-		"max_hits": 5,
+		"max_hits": 8,
 		"meteor_speed": 11.0,
 		"waypoint_radius": 3.5,
 		"course_distance": 50.0,
 		"course_points": [
 			Vector2(0, 0), Vector2(10, 20), Vector2(-10, 40), Vector2(10, 60), Vector2(0, 80)
-		]
+		],
+		"star_times": [30.0, 45.0, 60.0, 80.0],
 	},
 	Difficulty.INTERMEDIATE: {
 		"name": "Intermediate",
 		"meteor_count": 35,
 		"meteor_spawn_interval": 0.65,
-		"max_hits": 3,
+		"max_hits": 5,
 		"meteor_speed": 17.0,
 		"waypoint_radius": 3.0,
 		"course_distance": 80.0,
 		"course_points": [
-			Vector2(0, 0), Vector2(20, 30), Vector2(-20, 60), Vector2(20, 90), 
+			Vector2(0, 0), Vector2(20, 30), Vector2(-20, 60), Vector2(20, 90),
 			Vector2(-20, 120), Vector2(20, 150), Vector2(0, 180)
-		]
+		],
+		"star_times": [50.0, 70.0, 95.0, 120.0],
 	},
 	Difficulty.HARD: {
 		"name": "Hard",
 		"meteor_count": 90,
 		"meteor_spawn_interval": 0.4,
-		"max_hits": 1,
+		"max_hits": 3,
 		"meteor_speed": 24.0,
 		"waypoint_radius": 2.5,
 		"course_distance": 120.0,
 		"course_points": [
 			Vector2(0, 0), Vector2(30, 40), Vector2(-30, 80), Vector2(30, 120),
 			Vector2(-30, 160), Vector2(30, 200), Vector2(-30, 240), Vector2(30, 280), Vector2(0, 320)
-		]
+		],
+		"star_times": [80.0, 110.0, 140.0, 180.0],
 	},
 }
 
@@ -173,6 +176,20 @@ func unlock_skin_for_difficulty(diff: Difficulty) -> String:
 				newly_unlocked = skin["name"]
 	save_prefs()
 	return newly_unlocked
+
+func calculate_stars(diff: Difficulty, time_used: float) -> int:
+	var cfg: Dictionary = DIFFICULTY_CONFIGS[diff]
+	var thresholds: Array = cfg["star_times"]
+	if time_used <= thresholds[0]:
+		return 5
+	elif time_used <= thresholds[1]:
+		return 4
+	elif time_used <= thresholds[2]:
+		return 3
+	elif time_used <= thresholds[3]:
+		return 2
+	else:
+		return 1
 
 func has_next_level() -> bool:
 	return current_difficulty < Difficulty.HARD
