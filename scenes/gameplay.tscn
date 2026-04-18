@@ -1,7 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://b1mmplay0void"]
+[gd_scene load_steps=9 format=3 uid="uid://b1mmplay0void"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gp"]
 [ext_resource type="PackedScene" uid="uid://b1mmplayer0void" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="AudioStream" path="res://reference/Space Music Pack/battle.wav" id="3_music"]
+[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="4_bg"]
+
+[sub_resource type="StandardMaterial3D" id="BgMaterial_void"]
+shading_mode = 2
+albedo_texture = ExtResource("4_bg")
+
+[sub_resource type="QuadMesh" id="BgMesh_void"]
+size = Vector2(64, 36)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_void"]
 sky_top_color = Color(0.02, 0.01, 0.06, 1)
@@ -42,6 +51,11 @@ fov = 70.0
 
 [node name="SpawnTimer" type="Timer" parent="."]
 wait_time = 0.9
+
+[node name="Background" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+mesh = SubResource("BgMesh_void")
+surface_material_override/0 = SubResource("BgMaterial_void")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -208,3 +222,8 @@ custom_minimum_size = Vector2(240, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Quit to Menu"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_music")
+autoplay = true
+volume_db = -8.0

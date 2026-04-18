@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1mmfinv0void"]
+[gd_scene load_steps=4 format=3 uid="uid://b1mmfinv0void"]
 
 [ext_resource type="Script" path="res://scripts/final_victory.gd" id="1_fin"]
+[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="2_bg"]
+[ext_resource type="AudioStream" path="res://reference/Space Music Pack/meet-the-princess.wav" id="3_music"]
 
 [node name="FinalVictory" type="Control"]
 layout_mode = 3
@@ -11,14 +13,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fin")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.02, 0.12, 1)
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -52,3 +56,8 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 26
 text = "Quit"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_music")
+autoplay = true
+volume_db = -8.0

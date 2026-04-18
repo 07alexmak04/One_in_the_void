@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1mmlvlsel0void"]
+[gd_scene load_steps=4 format=3 uid="uid://b1mmlvlsel0void"]
 
 [ext_resource type="Script" path="res://scripts/level_select.gd" id="1_lvlsel"]
+[ext_resource type="Texture2D" path="res://reference/Space Background.png" id="2_bg"]
+[ext_resource type="AudioStream" path="res://reference/Space Music Pack/loading.wav" id="3_music"]
 
 [node name="LevelSelect" type="Control"]
 layout_mode = 3
@@ -11,14 +13,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lvlsel")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.02, 0.08, 1)
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
@@ -75,3 +79,8 @@ offset_bottom = -24.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 22
 text = "Back"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_music")
+autoplay = true
+volume_db = -8.0
