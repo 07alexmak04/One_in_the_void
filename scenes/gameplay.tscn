@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b1mmplay0void"]
+[gd_scene load_steps=12 format=3 uid="uid://b1mmplay0void"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gp"]
 [ext_resource type="PackedScene" uid="uid://b1mmplayer0void" path="res://scenes/player.tscn" id="2_player"]
@@ -32,6 +32,32 @@ ambient_light_energy = 0.55
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.15, 0.85, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.15, 0.15, 0.15, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_border"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.8, 0.4, 0.5)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="Gameplay" type="Node3D"]
 script = ExtResource("1_gp")
@@ -113,6 +139,9 @@ grow_horizontal = 0
 max_value = 5.0
 value = 5.0
 show_percentage = false
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/over = SubResource("StyleBoxFlat_hp_border")
 
 [node name="GameOverPanel" type="Control" parent="HUD"]
 layout_mode = 3

@@ -53,19 +53,19 @@ theme_override_constants/separation = 20
 custom_minimum_size = Vector2(380, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
-text = "Beginner  -  15 rocks  |  5 hits"
+text = "Beginner  -  15s waves  |  5 hits"
 
 [node name="IntermediateButton" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(380, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
-text = "Intermediate  -  35 rocks  |  3 hits"
+text = "Intermediate  -  30s waves  |  3 hits"
 
 [node name="HardButton" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(380, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
-text = "Hard  -  60 rocks  |  1 hit"
+text = "Hard  -  60s waves  |  1 hit"
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 1

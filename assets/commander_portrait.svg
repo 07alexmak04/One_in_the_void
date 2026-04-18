@@ -1,0 +1,264 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="frame">
+      <rect x="0" y="0" width="512" height="512" rx="10"/>
+    </clipPath>
+    <!-- Dramatic side lighting gradient -->
+    <radialGradient id="key_light" cx="0.15" cy="0.35" r="0.8">
+      <stop offset="0%" stop-color="#e8b878" stop-opacity="0.9"/>
+      <stop offset="35%" stop-color="#c89058" stop-opacity="0.5"/>
+      <stop offset="70%" stop-color="#3a2810" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rim_light" cx="0.9" cy="0.3" r="0.65">
+      <stop offset="0%" stop-color="#4ac8ff" stop-opacity="0.5"/>
+      <stop offset="40%" stop-color="#2a6890" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="face_base" cx="0.4" cy="0.4" r="0.55">
+      <stop offset="0%" stop-color="#8a6840"/>
+      <stop offset="50%" stop-color="#5a4028"/>
+      <stop offset="100%" stop-color="#2a1a0c"/>
+    </radialGradient>
+    <radialGradient id="face_highlight" cx="0.3" cy="0.35" r="0.4">
+      <stop offset="0%" stop-color="#c8a070" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cap_grad" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#2a3a4a"/>
+      <stop offset="50%" stop-color="#18242e"/>
+      <stop offset="100%" stop-color="#0a1018"/>
+    </linearGradient>
+    <linearGradient id="uniform_grad" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#1e2e3e"/>
+      <stop offset="100%" stop-color="#0a1018"/>
+    </linearGradient>
+    <linearGradient id="brim_grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2430"/>
+      <stop offset="100%" stop-color="#060a10"/>
+    </linearGradient>
+    <filter id="glow_blue">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#4af0ff" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow_red">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#ff3020" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft_shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="4" dy="4"/>
+      <feFlood flood-color="#000" flood-opacity="0.5"/>
+      <feComposite in2="SourceAlpha" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="inner_shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feOffset dx="-3" dy="2" result="offset"/>
+      <feFlood flood-color="#000" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="offset" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="noise" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feBlend in="SourceGraphic" mode="multiply" result="noisy"/>
+      <feComposite in="SourceGraphic" in2="noisy" operator="arithmetic" k1="0" k2="0.85" k3="0.15" k4="0"/>
+    </filter>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <!-- Deep black background -->
+    <rect width="512" height="512" fill="#06080c"/>
+
+    <!-- === UNIFORM — mostly in shadow === -->
+    <path d="M80,430 Q90,380 165,352 L256,372 L347,352 Q422,380 432,430 L440,520 L72,520 Z" fill="url(#uniform_grad)" filter="url(#inner_shadow)"/>
+    <!-- Collar -->
+    <path d="M200,358 L256,396 L312,358" fill="#14202c"/>
+    <path d="M210,362 L256,390 L302,362" fill="none" stroke="#1e3040" stroke-width="1"/>
+    <!-- Shirt glimpse -->
+    <rect x="249" y="390" width="14" height="35" fill="#c8c0b4" opacity="0.25"/>
+    <!-- Shoulder boards — lit side only -->
+    <rect x="100" y="380" width="72" height="14" rx="3" fill="#18242e" stroke="#a08838" stroke-width="1.5" opacity="0.8"/>
+    <line x1="108" y1="385" x2="164" y2="385" stroke="#a08838" stroke-width="2" opacity="0.7"/>
+    <line x1="108" y1="390" x2="164" y2="390" stroke="#a08838" stroke-width="1.5" opacity="0.5"/>
+    <!-- Right shoulder — in shadow, barely visible -->
+    <rect x="340" y="380" width="72" height="14" rx="3" fill="#0c1620" stroke="#605020" stroke-width="1" opacity="0.4"/>
+    <!-- Medals — just a glint on left side -->
+    <g transform="translate(165,415)" opacity="0.6">
+      <rect x="0" y="0" width="12" height="7" rx="1" fill="#a03028"/>
+      <rect x="14" y="0" width="12" height="7" rx="1" fill="#2870a8"/>
+      <rect x="28" y="0" width="12" height="7" rx="1" fill="#28884a"/>
+      <rect x="0" y="9" width="12" height="7" rx="1" fill="#a08828"/>
+    </g>
+    <!-- Star badge — catching light -->
+    <g transform="translate(305,425)" opacity="0.35">
+      <circle cx="0" cy="0" r="12" fill="#806820"/>
+      <polygon points="0,-8 2,-3 7,-3 3,1 4.5,6 0,3.5 -4.5,6 -3,1 -7,-3 -2,-3" fill="#a08838"/>
+    </g>
+
+    <!-- === NECK — deep shadow === -->
+    <rect x="224" y="310" width="64" height="50" rx="8" fill="#3a2810" opacity="0.7"/>
+    <!-- Lit side of neck -->
+    <path d="M224,315 Q230,310 240,312 L240,355 L224,355 Z" fill="#7a5830" opacity="0.4"/>
+
+    <!-- === HEAD — dramatically lit === -->
+    <!-- Base head shape — dark -->
+    <path d="M178,200 Q176,148 200,116 Q226,84 256,82 Q286,84 312,116 Q336,148 334,200 L330,258 Q326,290 306,312 Q286,326 256,328 Q226,326 206,312 Q186,290 182,258 Z" fill="url(#face_base)" filter="url(#noise)"/>
+
+    <!-- Key light — warm, from upper left -->
+    <path d="M178,200 Q176,148 200,116 Q226,84 256,82 Q286,84 312,116 Q336,148 334,200 L330,258 Q326,290 306,312 Q286,326 256,328 Q226,326 206,312 Q186,290 182,258 Z" fill="url(#face_highlight)"/>
+
+    <!-- Right side deep shadow — face half in darkness -->
+    <path d="M270,82 Q286,84 312,116 Q336,148 334,200 L330,258 Q326,290 306,312 Q286,326 270,328 Z" fill="#0a0a08" opacity="0.55"/>
+
+    <!-- === CAP — dark, authoritative === -->
+    <path d="M158,168 Q156,118 200,86 Q232,68 256,66 Q280,68 312,86 Q356,118 354,168 Z" fill="url(#cap_grad)" filter="url(#inner_shadow)"/>
+    <!-- Brim — casting shadow on upper face -->
+    <ellipse cx="256" cy="170" rx="112" ry="20" fill="url(#brim_grad)"/>
+    <!-- Brim edge catch light -->
+    <ellipse cx="220" cy="168" rx="50" ry="4" fill="#2a3a48" opacity="0.4"/>
+    <!-- Cap band -->
+    <rect x="166" y="148" width="180" height="22" rx="2" fill="#14202c" stroke="#8a7830" stroke-width="1"/>
+    <!-- Gold band lines -->
+    <line x1="170" y1="156" x2="342" y2="156" stroke="#8a7830" stroke-width="1.5" opacity="0.6"/>
+    <line x1="170" y1="164" x2="342" y2="164" stroke="#8a7830" stroke-width="1" opacity="0.4"/>
+    <!-- Badge -->
+    <g transform="translate(256,157)">
+      <circle cx="0" cy="0" r="10" fill="#8a7830" opacity="0.8"/>
+      <circle cx="0" cy="0" r="7" fill="#14202c"/>
+      <polygon points="0,-5 1.2,-1.5 5,-1.5 2,0.8 3.2,4.5 0,2.5 -3.2,4.5 -2,0.8 -5,-1.5 -1.2,-1.5" fill="#b0983c"/>
+    </g>
+    <!-- Brim shadow on face -->
+    <path d="M180,170 Q256,185 332,170 Q330,195 256,200 Q182,195 180,170 Z" fill="#000000" opacity="0.5"/>
+
+    <!-- === EARS — mostly hidden === -->
+    <ellipse cx="176" cy="218" rx="10" ry="18" fill="#5a4028" opacity="0.6"/>
+    <ellipse cx="336" cy="218" rx="8" ry="16" fill="#1a1008" opacity="0.3"/>
+
+    <!-- === EYES — fierce narrow slits, catching light === -->
+    <!-- Shadow above eyes from brim -->
+    <rect x="190" y="195" width="132" height="12" rx="4" fill="#000" opacity="0.3"/>
+
+    <!-- Left eye — lit side, visible -->
+    <path d="M204,216 Q218,204 246,214 Q226,226 204,216 Z" fill="#c8c0b0" opacity="0.85"/>
+    <circle cx="224" cy="215" r="8" fill="#2a1c08"/>
+    <circle cx="224" cy="215" r="4.5" fill="#0c0804"/>
+    <circle cx="228" cy="212" r="2" fill="#e8d8c0" opacity="0.5"/>
+    <!-- Angry squint fold above left eye -->
+    <path d="M206,210 Q224,204 246,209" fill="none" stroke="#2a1a0c" stroke-width="2" opacity="0.6"/>
+
+    <!-- Right eye — shadow side, dimmer -->
+    <path d="M266,214 Q294,206 310,216 Q290,224 266,214 Z" fill="#8a8478" opacity="0.5"/>
+    <circle cx="288" cy="215" r="7" fill="#1a1008"/>
+    <circle cx="288" cy="215" r="4" fill="#0c0804"/>
+    <!-- Faint reflection -->
+    <circle cx="291" cy="213" r="1.5" fill="#6a8aa0" opacity="0.3"/>
+
+    <!-- Eyebrows — HEAVY, casting shadow, furious angle -->
+    <path d="M194,198 Q212,180 250,194" fill="none" stroke="#1a1008" stroke-width="10" stroke-linecap="round"/>
+    <path d="M262,194 Q300,180 318,198" fill="none" stroke="#0c0804" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Under-eye shadows — deep exhaustion -->
+    <path d="M206,224 Q224,232 244,226" fill="#2a1a0c" opacity="0.4"/>
+    <path d="M268,226 Q288,230 308,224" fill="#0a0a08" opacity="0.3"/>
+
+    <!-- Crow's feet — lit side only visible -->
+    <g stroke="#5a4028" stroke-width="1.5" opacity="0.35">
+      <line x1="198" y1="212" x2="186" y2="206"/>
+      <line x1="198" y1="216" x2="184" y2="216"/>
+      <line x1="198" y1="220" x2="186" y2="226"/>
+    </g>
+
+    <!-- Forehead wrinkles — visible in light -->
+    <path d="M200,182 Q230,176 256,178" fill="none" stroke="#7a5830" stroke-width="1.5" opacity="0.35"/>
+    <path d="M206,188 Q230,184 252,186" fill="none" stroke="#7a5830" stroke-width="1" opacity="0.25"/>
+
+    <!-- === NOSE — strong, angular, catching light on left === -->
+    <path d="M254,218 L246,256 Q240,268 234,272" fill="none" stroke="#7a5830" stroke-width="3" stroke-linecap="round"/>
+    <path d="M240,268 Q256,278 272,270" fill="none" stroke="#5a4028" stroke-width="2.5"/>
+    <!-- Nose highlight — lit edge -->
+    <path d="M252,220 L246,250" fill="none" stroke="#c8a070" stroke-width="2" opacity="0.3"/>
+    <!-- Nostril shadow -->
+    <ellipse cx="244" cy="270" rx="6" ry="4" fill="#1a1008" opacity="0.4"/>
+
+    <!-- Nasolabial folds — deep, lit side -->
+    <path d="M228,244 Q222,268 216,290" fill="none" stroke="#5a4028" stroke-width="2.5" opacity="0.4"/>
+    <path d="M282,244 Q286,268 292,290" fill="none" stroke="#1a1008" stroke-width="2" opacity="0.25"/>
+
+    <!-- === MOUTH — grim downward frown === -->
+    <path d="M222,292 Q240,298 256,296 Q272,298 290,292" fill="none" stroke="#4a3020" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Deep frown corners -->
+    <path d="M222,292 Q216,296 212,304" fill="none" stroke="#4a3020" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M290,292 Q294,296 298,302" fill="none" stroke="#1a1008" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- Mustache — thick, dark -->
+    <path d="M226,280 Q240,274 256,276 Q272,274 286,280 Q272,286 256,288 Q240,286 226,280 Z" fill="#1a1008" opacity="0.65"/>
+
+    <!-- Chin — strong jaw, hard lines -->
+    <path d="M212,312 Q256,330 300,312" fill="none" stroke="#3a2810" stroke-width="2" opacity="0.4"/>
+    <line x1="256" y1="314" x2="256" y2="324" stroke="#3a2810" stroke-width="2" opacity="0.25"/>
+
+    <!-- Stubble shadow across jaw -->
+    <path d="M200,290 Q220,310 256,318 Q292,310 312,290" fill="#1a1810" opacity="0.12"/>
+
+    <!-- Cheek hollows -->
+    <ellipse cx="200" cy="258" rx="16" ry="24" fill="#1a1008" opacity="0.2"/>
+    <ellipse cx="312" cy="258" rx="16" ry="24" fill="#0a0a08" opacity="0.25"/>
+
+    <!-- === SCAR — across right cheek, catches rim light === -->
+    <path d="M296,230 L312,264 L318,282" fill="none" stroke="#8a7860" stroke-width="2.5" opacity="0.3"/>
+    <path d="M296,230 L312,264 L318,282" fill="none" stroke="#4ac8ff" stroke-width="1" opacity="0.08"/>
+
+    <!-- === LIGHTING LAYERS === -->
+    <!-- Warm key light overlay -->
+    <path d="M178,200 Q176,148 200,116 Q226,84 256,82 L256,328 Q226,326 206,312 Q186,290 182,258 Z" fill="url(#key_light)" opacity="0.3"/>
+
+    <!-- Cool rim light — right edge -->
+    <path d="M310,116 Q336,148 334,200 L330,258 Q326,290 306,312 Q286,326 256,328 L256,82 Q286,84 310,116 Z" fill="url(#rim_light)" opacity="0.35"/>
+    <!-- Rim light edge on right jaw -->
+    <path d="M320,200 Q332,230 328,265 Q322,295 306,312" fill="none" stroke="#4ac8ff" stroke-width="2.5" opacity="0.2"/>
+    <!-- Rim light on right cap edge -->
+    <path d="M312,86 Q350,114 354,168" fill="none" stroke="#4ac8ff" stroke-width="2" opacity="0.15"/>
+
+    <!-- Red alarm light from below left -->
+    <path d="M80,430 Q100,380 180,360 L180,290" fill="none" stroke="#ff2010" stroke-width="60" opacity="0.03"/>
+    <ellipse cx="180" cy="440" rx="120" ry="80" fill="#ff2010" opacity="0.04"/>
+
+    <!-- === VIGNETTE === -->
+    <radialGradient id="vignette" cx="0.5" cy="0.45" r="0.6">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
+    </radialGradient>
+    <rect width="512" height="512" fill="url(#vignette)"/>
+
+    <!-- === SUBTLE FILM GRAIN === -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="512" height="512" filter="url(#grain)" opacity="0.06"/>
+  </g>
+
+  <!-- === FRAME — minimal, tactical === -->
+  <rect x="1" y="1" width="510" height="510" rx="10" fill="none" stroke="#18242e" stroke-width="3"/>
+  <!-- Thin inner accent -->
+  <rect x="4" y="4" width="504" height="504" rx="8" fill="none" stroke="#4af0ff" stroke-width="0.75" opacity="0.25"/>
+  <!-- Corner brackets -->
+  <g stroke="#4af0ff" stroke-width="2" opacity="0.5" fill="none">
+    <path d="M6,32 L6,6 L32,6"/>
+    <path d="M480,6 L506,6 L506,32"/>
+    <path d="M6,480 L6,506 L32,506"/>
+    <path d="M480,506 L506,506 L506,480"/>
+  </g>
+  <!-- Mic active indicator -->
+  <circle cx="24" cy="490" r="4" fill="#ff3020" opacity="0.7" filter="url(#glow_red)"/>
+  <text x="36" y="494" font-family="monospace" font-size="9" fill="#ff3020" opacity="0.5">LIVE</text>
+  <!-- ID tag -->
+  <text x="400" y="494" font-family="monospace" font-size="9" fill="#4af0ff" opacity="0.3">CDR.YAO</text>
+</svg>

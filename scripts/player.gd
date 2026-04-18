@@ -50,6 +50,95 @@ func _ready() -> void:
 	add_to_group("player")
 	collision_layer = 1 << 1
 	collision_mask = (1 << 2) | (1 << 4)
+	_apply_skin()
+
+func _apply_skin() -> void:
+	var skin_data: Dictionary = GameState.get_selected_skin_data()
+	# Remove existing visual children of Mesh node.
+	for child in mesh.get_children():
+		child.queue_free()
+	# Remove old engine trail if any.
+	var old_trail := get_node_or_null("EngineTrail")
+	if old_trail:
+		old_trail.queue_free()
+	# Load the selected ship model.
+	var model_scene = load(skin_data["model"])
+	if model_scene == null:
+		return
+	var s: float = skin_data["scale"]
+	var instance: Node3D = model_scene.instantiate()
+	instance.transform = Transform3D(
+		Vector3(0, 0, s), Vector3(0, s, 0), Vector3(-s, 0, 0),
+		Vector3.ZERO
+	)
+	# Apply original texture — keep ship detail clean.
+	# Only add a subtle emission glow for differentiation.
+	var tex = load(skin_data["texture"])
+	if tex:
+		var emission_col: Color = skin_data["emission_color"]
+		var emission_str: float = skin_data["emission_energy"]
+		var mat := StandardMaterial3D.new()
+		mat.albedo_texture = tex
+		mat.metallic = 0.4
+		mat.roughness = 0.3
+		mat.emission_enabled = true
+		mat.emission = emission_col
+		mat.emission_energy_multiplier = emission_str
+		_apply_material_recursive(instance, mat)
+	mesh.add_child(instance)
+	# Add engine trail with skin-specific color.
+	_add_engine_trail(skin_data)
+
+func _add_engine_trail(skin_data: Dictionary) -> void:
+	var trail_color: Color = skin_data["trail_color"]
+	# OmniLight3D as engine glow behind the ship.
+	var glow := OmniLight3D.new()
+	glow.name = "EngineTrail"
+	glow.light_color = trail_color
+	glow.light_energy = 1.5
+	glow.omni_range = 3.0
+	glow.position = Vector3(0, 0, 1.5)
+	add_child(glow)
+	# GPUParticles3D for exhaust trail.
+	var particles := GPUParticles3D.new()
+	particles.name = "ExhaustParticles"
+	particles.amount = 30
+	particles.lifetime = 0.6
+	particles.emitting = true
+	var pmat := ParticleProcessMaterial.new()
+	pmat.direction = Vector3(0, 0, 1)
+	pmat.spread = 15.0
+	pmat.initial_velocity_min = 4.0
+	pmat.initial_velocity_max = 8.0
+	pmat.gravity = Vector3.ZERO
+	pmat.scale_min = 0.15
+	pmat.scale_max = 0.35
+	pmat.color = trail_color
+	var color_ramp := Gradient.new()
+	color_ramp.set_color(0, Color(trail_color.r, trail_color.g, trail_color.b, 1.0))
+	color_ramp.set_color(1, Color(trail_color.r, trail_color.g, trail_color.b, 0.0))
+	var tex_grad := GradientTexture1D.new()
+	tex_grad.gradient = color_ramp
+	pmat.color_ramp = tex_grad
+	particles.process_material = pmat
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.2, 0.2)
+	var quad_mat := StandardMaterial3D.new()
+	quad_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	quad_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	quad_mat.vertex_color_use_as_albedo = true
+	quad_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	quad.material = quad_mat
+	particles.draw_pass_1 = quad
+	particles.position = Vector3(0, 0, 1.3)
+	add_child(particles)
+
+func _apply_material_recursive(node: Node, mat: Material) -> void:
+	if node is MeshInstance3D:
+		for i in node.get_surface_override_material_count():
+			node.set_surface_override_material(i, mat)
+	for child in node.get_children():
+		_apply_material_recursive(child, mat)
 
 func _physics_process(delta: float) -> void:
 	_rifle_timer = max(_rifle_timer - delta, 0.0)

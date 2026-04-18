@@ -1,9 +1,62 @@
 extends Control
 
 @onready var quit_button: Button = $CenterContainer/VBox/QuitButton
+@onready var unlock_label: Label = $CenterContainer/VBox/UnlockLabel
+@onready var unlock_preview: SubViewportContainer = $CenterContainer/VBox/UnlockPreview
+@onready var preview_root: Node3D = $CenterContainer/VBox/UnlockPreview/SubViewport/PreviewScene/ModelRoot
+
+var _preview_instance: Node3D = null
+var _spin_time: float = 0.0
 
 func _ready() -> void:
+	var new_skin_name := GameState.unlock_skin_for_level(GameState.Difficulty.HARD)
+	if new_skin_name != "":
+		unlock_label.text = "LEGENDARY SHIP UNLOCKED: %s" % new_skin_name
+		unlock_label.visible = true
+		unlock_preview.visible = true
+		_show_unlocked_ship(new_skin_name)
+	else:
+		unlock_label.visible = false
+		unlock_preview.visible = false
 	quit_button.pressed.connect(_on_quit_pressed)
+
+func _process(delta: float) -> void:
+	_spin_time += delta
+	if is_instance_valid(_preview_instance):
+		_preview_instance.rotation.y = _spin_time * 1.2
+
+func _show_unlocked_ship(skin_name: String) -> void:
+	var skin: Dictionary = {}
+	for s in GameState.SHIP_SKINS:
+		if s["name"] == skin_name:
+			skin = s
+			break
+	if skin.is_empty():
+		return
+	var model_scene = load(skin["model"])
+	if model_scene == null:
+		return
+	_preview_instance = model_scene.instantiate()
+	var s: float = skin.get("scale", 0.1) * 1.5
+	_preview_instance.scale = Vector3(s, s, s)
+	var tex = load(skin["texture"])
+	if tex:
+		var mat := StandardMaterial3D.new()
+		mat.albedo_texture = tex
+		mat.metallic = 0.4
+		mat.roughness = 0.3
+		mat.emission_enabled = true
+		mat.emission = skin.get("emission_color", Color.BLACK)
+		mat.emission_energy_multiplier = skin.get("emission_energy", 0.3)
+		_apply_mat(_preview_instance, mat)
+	preview_root.add_child(_preview_instance)
+
+func _apply_mat(node: Node, mat: Material) -> void:
+	if node is MeshInstance3D:
+		for i in node.get_surface_override_material_count():
+			node.set_surface_override_material(i, mat)
+	for child in node.get_children():
+		_apply_mat(child, mat)
 
 func _on_quit_pressed() -> void:
 	GameState.reset_progression()
