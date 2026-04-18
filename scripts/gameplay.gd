@@ -1,6 +1,7 @@
 extends Node3D
 
 const MeteoriteScene := preload("res://scenes/meteorite.tscn")
+const ChaosBuddyScene := preload("res://scenes/chaos_buddy.tscn")
 
 @onready var player: CharacterBody3D = $World/Player
 @onready var camera: Camera3D = $Camera3D
@@ -24,6 +25,7 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var skill_cd_bar: ProgressBar = $HUD/SkillPanel/VBox/CooldownBar
 @onready var skill_ready_label: Label = $HUD/SkillPanel/VBox/ReadyLabel
 @onready var world_env: WorldEnvironment = $WorldEnvironment
+@onready var menu_button: Button = $HUD/TopPanel/MenuButton
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
@@ -77,12 +79,16 @@ func _ready() -> void:
 	spawn_timer.timeout.connect(_spawn_meteorite)
 	spawn_timer.start()
 	
+	# Spawn chaos buddy companion drone.
+	_spawn_chaos_buddy()
+
 	game_over_panel.visible = false
 	pause_panel.visible = false
 	retry_button.pressed.connect(_on_retry)
 	go_quit_button.pressed.connect(_on_quit_to_menu)
 	resume_button.pressed.connect(_on_resume)
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
+	menu_button.pressed.connect(_toggle_pause)
 	music_player.finished.connect(music_player.play)
 
 func _setup_course() -> void:
@@ -283,6 +289,15 @@ func _spawn_meteorite() -> void:
 	var dir := (target - start).normalized()
 	var hp := 2 + (GameState.current_difficulty)
 	m.configure(start, dir * speed, hp)
+
+func _spawn_chaos_buddy() -> void:
+	var buddy := ChaosBuddyScene.instantiate()
+	world.add_child(buddy)
+	buddy.global_position = player.global_position + Vector3(3, 1, 0)
+	# Harder difficulties: shoots faster and more likely to hit the player.
+	var shoot_interval := 2.5 - GameState.current_difficulty * 0.5  # 2.5 / 2.0 / 1.5
+	var aim_chance := 0.1 + GameState.current_difficulty * 0.05     # 10% / 15% / 20%
+	buddy.configure(shoot_interval, aim_chance)
 
 func trigger_slow_motion(multiplier: float, duration: float) -> void:
 	rock_speed_multiplier = multiplier
