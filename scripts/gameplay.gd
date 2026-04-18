@@ -15,11 +15,16 @@ const MeteoriteScene := preload("res://scenes/meteorite.tscn")
 @onready var resume_button: Button = $HUD/PausePanel/VBox/ResumeButton
 @onready var pause_quit_button: Button = $HUD/PausePanel/VBox/QuitButton
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
+@onready var camera: Camera3D = $Camera3D
 
 var cfg: Dictionary
 var meteors_to_spawn: int = 0
 var rocks_avoided: int = 0
 var finished: bool = false
+
+var _hit_flash: ColorRect = null
+var _camera_origin: Vector3 = Vector3.ZERO
+var _health_fill_style: StyleBoxFlat = null
 
 func _ready() -> void:
 	randomize()
@@ -27,10 +32,15 @@ func _ready() -> void:
 	meteors_to_spawn = int(cfg["meteor_count"])
 	level_label.text = "Level: %s" % cfg["name"]
 	_update_rock_label()
+	_camera_origin = camera.position
 
-	player.configure(int(cfg["max_hits"]))
+	_build_hit_flash()
+	_build_health_style()
+
+	player.configure(int(cfg["max_hits"]), int(cfg["hit_damage"]))
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
+	player.got_hit.connect(_on_player_got_hit)
 	_on_player_health_changed(int(cfg["max_hits"]), int(cfg["max_hits"]))
 
 	spawn_timer.wait_time = float(cfg["meteor_spawn_interval"])
@@ -45,14 +55,47 @@ func _ready() -> void:
 	pause_quit_button.pressed.connect(_on_quit_to_menu)
 	music_player.finished.connect(music_player.play)
 
+func _build_health_style() -> void:
+	_health_fill_style = StyleBoxFlat.new()
+	_health_fill_style.bg_color = Color(0.2, 0.9, 0.2)
+	health_bar.add_theme_stylebox_override("fill", _health_fill_style)
+
+func _build_hit_flash() -> void:
+	_hit_flash = ColorRect.new()
+	_hit_flash.color = Color(1.0, 0.0, 0.0, 0.0)
+	_hit_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hud: CanvasLayer = $HUD
+	hud.add_child(_hit_flash)
+	# Stretch to fill screen
+	_hit_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+func _on_player_got_hit() -> void:
+	_do_hit_flash()
+	_do_camera_shake()
+
+func _do_hit_flash() -> void:
+	_hit_flash.color.a = 0.55
+	var tw := create_tween()
+	tw.tween_property(_hit_flash, "color:a", 0.0, 0.35)
+
+func _do_camera_shake() -> void:
+	var tw := create_tween()
+	tw.set_loops(6)
+	tw.tween_method(func(t: float) -> void:
+		camera.position = _camera_origin + Vector3(
+			sin(t * 40.0) * 0.18,
+			cos(t * 37.0) * 0.14,
+			0.0
+		)
+	, 0.0, 1.0, 0.05)
+	tw.tween_callback(func() -> void: camera.position = _camera_origin)
+
 func _process(_delta: float) -> void:
 	if finished:
 		return
 	if Input.is_action_just_pressed("pause"):
 		_toggle_pause()
 		return
-
-	# Win once all rocks are spawned and none remain in the scene.
 	if meteors_to_spawn == 0 and get_tree().get_nodes_in_group("meteorite").is_empty():
 		_on_level_cleared()
 
@@ -93,6 +136,14 @@ func _on_player_health_changed(current: int, max_hp: int) -> void:
 		return
 	health_bar.max_value = max_hp
 	health_bar.value = current
+	if _health_fill_style:
+		var pct := float(current) / float(max_hp)
+		var c: Color
+		if pct > 0.5:
+			c = Color(0.2, 0.9, 0.2).lerp(Color(1.0, 0.85, 0.0), (1.0 - pct) * 2.0)
+		else:
+			c = Color(1.0, 0.85, 0.0).lerp(Color(0.9, 0.1, 0.1), (0.5 - pct) * 2.0)
+		_health_fill_style.bg_color = c
 
 func _on_player_died() -> void:
 	finished = true
