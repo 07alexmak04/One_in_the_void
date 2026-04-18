@@ -6,6 +6,8 @@ extends Node3D
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var ship_placeholder: Node3D = $ShipPreviewPivot/ShipPlaceholder
 @onready var ship_pivot: Node3D = $ShipPreviewPivot
+@onready var planet_pivot: Node3D = $PlanetPivot
+@onready var planet_placeholder: Node3D = $PlanetPivot/PlanetPlaceholder
 
 var _time: float = 0.0
 
@@ -15,28 +17,45 @@ func _ready() -> void:
 	quit_button.pressed.connect(_on_quit_pressed)
 	music_player.finished.connect(music_player.play)
 	
+	# Connect hover animations for all buttons in the container
+	for btn in $CanvasLayer/UI/MenuContainer.get_children():
+		if btn is Button:
+			btn.mouse_entered.connect(_on_button_hover.bind(btn, true))
+			btn.mouse_exited.connect(_on_button_hover.bind(btn, false))
+			btn.pivot_offset = btn.size / 2.0 # Ensure scale happens from center
+	
 	_load_ship_preview()
 	_create_menu_starfield()
+	_load_planet_background()
+
+func _on_button_hover(btn: Button, hovered: bool) -> void:
+	var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var target_scale := Vector2(1.05, 1.05) if hovered else Vector2(1.0, 1.0)
+	tw.tween_property(btn, "scale", target_scale, 0.2)
 
 func _process(delta: float) -> void:
 	_time += delta
-	# Subtle drifting rotation
+	# Subtle drifting rotation for the ship
 	ship_pivot.rotation.y += delta * 0.15
 	ship_pivot.rotation.x = sin(_time * 0.5) * 0.1
 	ship_pivot.position.y = sin(_time * 0.8) * 0.15
+	
+	# Rotate the entire planet system slowly
+	if planet_pivot:
+		planet_pivot.rotation.y += delta * 0.015
+		planet_pivot.rotation.z = sin(_time * 0.2) * 0.03
 
 func _load_ship_preview() -> void:
 	var skin_data: Dictionary = GameState.get_selected_skin_data()
 	var model_scene = load(skin_data["model"])
 	if model_scene:
 		var instance: Node3D = model_scene.instantiate()
-		var s: float = skin_data["scale"] * 0.8 # Reduced scale to fit better in menu
+		var s: float = skin_data["scale"] * 0.8
 		instance.transform = Transform3D(
 			Vector3(0, 0, s), Vector3(0, s, 0), Vector3(-s, 0, 0),
 			Vector3.ZERO
 		)
 		
-		# Apply texture and emission
 		var tex = load(skin_data["texture"])
 		if tex:
 			var mat := StandardMaterial3D.new()
@@ -49,6 +68,42 @@ func _load_ship_preview() -> void:
 			_apply_material_recursive(instance, mat)
 			
 		ship_placeholder.add_child(instance)
+
+func _load_planet_background() -> void:
+	# Define a small "Solar System" for the menu
+	var planets := [
+		{
+			"scene": "res://addons/naejimer_3d_planet_generator/scenes/planet_terrestrial.tscn",
+			"pos": Vector3(-8, 2, -15),
+			"scale": 5.5
+		},
+		{
+			"scene": "res://addons/naejimer_3d_planet_generator/scenes/planet_gaseous.tscn",
+			"pos": Vector3(12, -5, -35),
+			"scale": 12.0
+		},
+		{
+			"scene": "res://addons/naejimer_3d_planet_generator/scenes/planet_ice.tscn",
+			"pos": Vector3(4, 8, -25),
+			"scale": 3.0
+		},
+		{
+			"scene": "res://addons/naejimer_3d_planet_generator/scenes/planet_lava.tscn",
+			"pos": Vector3(-15, -6, -20),
+			"scale": 2.5
+		}
+	]
+	
+	for p_info in planets:
+		var planet_scene = load(p_info["scene"])
+		if planet_scene:
+			var instance: Node3D = planet_scene.instantiate()
+			instance.position = p_info["pos"]
+			var s: float = p_info["scale"]
+			instance.scale = Vector3(s, s, s)
+			# Add a random initial rotation for variety
+			instance.rotation = Vector3(randf(), randf(), randf())
+			planet_placeholder.add_child(instance)
 
 func _apply_material_recursive(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:
