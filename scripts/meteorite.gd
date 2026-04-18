@@ -1,6 +1,7 @@
 extends Area3D
 
 signal passed
+signal exploded(pos: Vector3)
 
 const _STONE_MESH := preload("res://reference/Stones/STONE#1/STONE#1.obj")
 const _STONE_COLOR := preload("res://reference/Stones/STONE#1/STONE#1_Textures/STONE#1_color.png")
@@ -67,6 +68,7 @@ func _explode() -> void:
 			if is_instance_valid(p) and p.global_position.distance_to(pos) <= explosion_radius:
 				p.take_hit()
 
+	emit_signal("exploded", pos)
 	_spawn_explosion_vfx(pos)
 	queue_free()
 
