@@ -201,6 +201,14 @@ func advance_level() -> void:
 func reset_progression() -> void:
 	current_difficulty = Difficulty.BEGINNER
 
+func reset_all_data() -> void:
+	unlocked_skins = ["light_cruiser_01"]
+	selected_skin = "light_cruiser_01"
+	current_difficulty = Difficulty.BEGINNER
+	last_time_used = 0.0
+	last_stars = 0
+	save_prefs()
+
 func save_prefs() -> void:
 	var f = FileAccess.open("user://prefs.save", FileAccess.WRITE)
 	var data = {

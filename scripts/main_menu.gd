@@ -21,6 +21,7 @@ func _ready() -> void:
 	custom_ship_button.pressed.connect(_on_custom_ship_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
 	music_player.finished.connect(music_player.play)
+	_build_reset_button()
 	
 	# Connect hover animations for all buttons in the container
 	for btn in $CanvasLayer/UI/MenuContainer.get_children():
@@ -154,3 +155,28 @@ func _on_custom_ship_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()
+
+func _build_reset_button() -> void:
+	var btn := Button.new()
+	btn.text = "↻"
+	btn.add_theme_font_size_override("font_size", 28)
+	btn.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 0.6))
+	btn.add_theme_color_override("font_hover_color", Color(1, 0.4, 0.3, 1))
+	btn.custom_minimum_size = Vector2(48, 48)
+	btn.tooltip_text = "Reset all progress & unlocks"
+	var ui: Control = $CanvasLayer/UI
+	ui.add_child(btn)
+	btn.anchor_left = 1.0
+	btn.anchor_top = 1.0
+	btn.anchor_right = 1.0
+	btn.anchor_bottom = 1.0
+	btn.offset_left = -68
+	btn.offset_top = -68
+	btn.offset_right = -20
+	btn.offset_bottom = -20
+	btn.pressed.connect(_on_reset_pressed)
+
+func _on_reset_pressed() -> void:
+	GameState.reset_all_data()
+	# Reload menu to reflect reset state.
+	get_tree().reload_current_scene()
