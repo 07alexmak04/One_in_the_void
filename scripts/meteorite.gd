@@ -10,7 +10,7 @@ const _STONE_ROUGH := preload("res://reference/Stones/STONE#1/STONE#1_Textures/S
 
 @export var speed: float = 12.0
 @export var hp: int = 3
-@export var explosion_radius: float = 5.0
+@export var explosion_radius: float = 3.0
 @export var explosion_damage: int = 2
 
 var velocity: Vector3 = Vector3.ZERO
@@ -203,20 +203,11 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	for i in range(14):
-		var debris := Area3D.new()
-		debris.collision_layer = 1 << 3
-		debris.collision_mask = (1 << 1) | (1 << 2)
-		debris.monitoring = false
+	for i in range(6):
+		# Visual-only debris — no collision with player.
+		var debris := Node3D.new()
 		scene_root.add_child(debris)
 		debris.global_position = pos
-		debris.set_deferred("monitoring", true)
-
-		var col := CollisionShape3D.new()
-		var shape := SphereShape3D.new()
-		shape.radius = 0.35
-		col.shape = shape
-		debris.add_child(col)
 
 		var mi := MeshInstance3D.new()
 		mi.mesh = _STONE_MESH
@@ -231,21 +222,6 @@ func _spawn_explosion_vfx(pos: Vector3) -> void:
 		var sz := rng.randf_range(0.18, 0.42)
 		mi.scale = Vector3(sz, sz * rng.randf_range(0.6, 1.4), sz * rng.randf_range(0.6, 1.4))
 		debris.add_child(mi)
-
-		debris.area_entered.connect(func(area: Area3D) -> void:
-			if not is_instance_valid(debris):
-				return
-			if area.has_method("take_damage"):
-				area.take_damage(2)
-			debris.set_deferred("monitoring", false)
-		)
-		debris.body_entered.connect(func(body: Node3D) -> void:
-			if not is_instance_valid(debris):
-				return
-			if body.has_method("take_hit"):
-				body.take_hit()
-			debris.set_deferred("monitoring", false)
-		)
 
 		var dir := Vector3(
 			rng.randf_range(-1.0, 1.0),
